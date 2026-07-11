@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "model-privacy-attacks"
+version = "0.1.0"
+description = "Offline, deterministic simulator for membership inference and model extraction attacks."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "poojakira" }]
+keywords = [
+    "membership-inference",
+    "model-extraction",
+    "privacy",
+    "machine-learning-security",
+]
+dependencies = [
+    "scikit-learn>=1.5",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/privacy_attacks"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]
