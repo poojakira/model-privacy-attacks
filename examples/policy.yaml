@@ -1,0 +1,14 @@
+# Example CI privacy-gate policy for `privacy-certify audit ... --policy policy.yaml`.
+# Any violated rule makes the CLI exit non-zero, failing the build.
+
+# Block releases whose membership leakage is certified as attributable to the model.
+require_verdict_not_in:
+  - CERTIFIED_LEAKAGE
+
+# Numeric thresholds. A rule "fails" (violates the gate) when the condition is TRUE.
+fail_if:
+  # Certified leakage beyond the blind baseline, on average.
+  "delta_auc.delta_ci_low": "> 0.02"
+  # If you have enough non-members for the low-FPR metric to be reliable, also gate on
+  # the worst-case exposure. (Remove this line if your run reports it as unavailable.)
+  # "low_fpr.certified_tpr_difference": "> 0.05"

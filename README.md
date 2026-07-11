@@ -88,6 +88,46 @@ See [`INCIDENT_REPORT.md`](INCIDENT_REPORT.md) for a full reproducible audit run
 including the key finding that shadow-model leakage tracks overfitting (AUC 0.51 for a
 model that generalizes vs 0.75 for one that memorizes).
 
+## The Privacy Certificate (v0.2) — a verdict, not just a number
+
+A raw attack AUC is frequently untrustworthy: it is inflated by distribution artifacts,
+by calibrating on the target, and by non-reproducibility. The `certification` layer turns
+an attack signal into a **null-calibrated, reproducible, gate-able verdict**.
+
+It compares the model-based attack against the *strongest blind baseline* it can build (a
+panel that never queries the model, looking only at the inputs) and certifies leakage
+only when the model out-separates that baseline with statistical significance.
+
+```python
+from privacy_attacks.certification import certify, CertificateConfig
+from privacy_attacks.certification.adapters import attack_scores
+
+# `model` is anything with predict_proba (sklearn, or a wrapper around a black-box API)
+scores = attack_scores(model, member_X, nonmember_X, signal="max_confidence")
+cert = certify(scores, member_X, nonmember_X, n_members=len(member_X),
+               config=CertificateConfig(target_id="my-model-v3"))
+print(cert.verdict)          # CERTIFIED_LEAKAGE | NO_MODEL_LEAKAGE | INCONCLUSIVE
+print(cert.to_json())        # signed, versioned, reproducible
+```
+
+**Validated on the canonical MI target (MNIST)** — see
+[`examples/REAL_MODEL_FINDINGS.md`](examples/REAL_MODEL_FINDINGS.md). Two nets with nearly
+identical *naive* attack AUC (0.558 vs 0.527) get different verdicts: the overfit MLP is
+**CERTIFIED_LEAKAGE** (delta 0.044, 95% CI [0.019, 0.070], p=0.001) while the regularized
+one is **INCONCLUSIVE**. The blind panel sits at 0.515, proving the difference is
+model-attributable. Only null-calibration separates the two.
+
+### CI gate
+
+```bash
+# member/nonmember attack scores + features saved to run.npz
+privacy-certify audit run.npz --policy examples/policy.yaml --out cert.json
+# exit code 2 if the policy is violated -> fails the build
+```
+
+Design, threat model, and honest limitations are documented in
+[`docs/PRIVACY_CERTIFICATE.md`](docs/PRIVACY_CERTIFICATE.md).
+
 ## Ethics & scope
 
 This is defensive tooling for privacy auditing and education. Run it against models you
