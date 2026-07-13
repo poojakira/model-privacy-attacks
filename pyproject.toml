@@ -19,9 +19,13 @@ classifiers = [
 dependencies = [
     "numpy>=1.21",
     "scikit-learn>=1.0",
+    "pytest>=7.0",
 ]
 
 [project.optional-dependencies]
+# pytest is included in the core dependencies so that the advertised
+# `pip install -e .` reproduce flow can run the test suite directly.
+# This extra is retained for backward compatibility.
 test = ["pytest>=7.0"]
 # The LLM demo can optionally use HuggingFace transformers to produce real
 # per-token log-probs. It is NOT required by the core library or the tests.
