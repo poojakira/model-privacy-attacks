@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "privacy-attacks"
+version = "0.1.0"
+description = "Membership-inference and model-extraction attacks on ML models, with an LLM Min-K% Prob extension."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Pooja Kiran" }]
+keywords = ["membership-inference", "model-extraction", "privacy", "machine-learning", "llm"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.21",
+    "scikit-learn>=1.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+# The LLM demo can optionally use HuggingFace transformers to produce real
+# per-token log-probs. It is NOT required by the core library or the tests.
+llm = ["transformers>=4.30", "torch>=2.0"]
+
+[project.urls]
+Homepage = "https://github.com/poojakira/model-privacy-attacks"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
