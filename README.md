@@ -32,3 +32,17 @@ and milestones before it is considered usable.
 When implemented, these techniques are for auditing the privacy of **your own**
 or explicitly authorized models. Do not use them against systems you do not
 have permission to test.
+
+
+## Novelty & honesty (be skeptical)
+
+There is nothing novel here yet — there is no code. When implemented, the
+planned techniques (membership inference, model inversion, attribute inference)
+are **well-established academic methods, not original research**; the value
+would be a clean, reproducible harness, not new attacks.
+
+To be credible, a privacy-attack tool must report against a **shared benchmark**
+(e.g. an MIA/MLPrivacy auditing framework with known-member / known-nonmember
+splits and DP-SGD models at known ε), because privacy-leakage numbers are
+meaningless without a common baseline. Until that exists here, treat any claim
+as aspirational.
