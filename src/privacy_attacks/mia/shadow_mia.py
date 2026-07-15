@@ -16,7 +16,7 @@ https://arxiv.org/abs/1610.05820
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Any, Optional, Protocol
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -75,7 +75,7 @@ class ShadowMIA:
         self.attack_model_cls = attack_model_cls
         self.random_state = random_state
 
-        self.attack_model_ = None
+        self.attack_model_: Any = None
         self.target_model_: Optional[_ProbaModel] = None
         self.n_features_: Optional[int] = None
 
@@ -147,10 +147,13 @@ class ShadowMIA:
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """Probability that each row of ``X`` was a member of the target's data."""
         self._check_fitted()
-        feats = self._features(self.target_model_, X)
-        proba = self.attack_model_.predict_proba(feats)
+        target_model = self.target_model_
+        attack_model = self.attack_model_
+        assert target_model is not None
+        feats = self._features(target_model, X)
+        proba = attack_model.predict_proba(feats)
         # Index of the positive ("member") class.
-        classes = list(self.attack_model_.classes_)
+        classes = list(attack_model.classes_)
         pos = classes.index(1.0) if 1.0 in classes else classes.index(1)
         return proba[:, pos]
 

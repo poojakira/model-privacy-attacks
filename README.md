@@ -34,9 +34,10 @@ extension for large language models (Min-K% Prob).
 git clone https://github.com/poojakira/model-privacy-attacks.git
 cd model-privacy-attacks
 pip install -e .            # core: numpy + scikit-learn only
+pip install -e ".[test]"     # test runner
 ```
 
-The core library and full test suite require **only numpy and scikit-learn** —
+The core library requires **only numpy and scikit-learn**. The test suite adds pytest only through the `test` extra —
 no model downloads. The LLM demo can optionally use real GPT-2 log-probs:
 
 ```bash
@@ -182,7 +183,7 @@ The baseline for every AUC is 0.50 (random guessing).
 ## Reproducing
 
 ```bash
-pip install -e .
+pip install -e ".[test]"
 pytest tests/test_privacy_attacks.py -v
 # or see the metrics printed on stdout:
 pytest tests/test_privacy_attacks.py -s

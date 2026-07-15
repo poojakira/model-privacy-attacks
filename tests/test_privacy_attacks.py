@@ -95,6 +95,28 @@ def test_direct_mia_auc():
     assert metrics["n_nonmembers"] == 1000
 
 
+def test_direct_mia_supports_non_zero_class_labels():
+    data = _make_pool()
+    y_members = data["y_members"] + 1
+    y_nonmembers = data["y_nonmembers"] + 1
+    target = _target_model(data["X_members"], y_members)
+
+    attack = DirectMIA(use_true_label=True)
+    attack.fit(
+        target,
+        data["X_members"],
+        y_members,
+        data["X_nonmembers"],
+        y_nonmembers,
+    )
+    metrics = attack.evaluate(
+        data["X_members"], data["X_nonmembers"], y_members, y_nonmembers
+    )
+
+    assert metrics["auc"] > 0.55, metrics
+    assert 0.0 <= metrics["accuracy"] <= 1.0
+
+
 def test_shadow_mia_auc():
     data = _make_pool()
     target = _target_model(data["X_members"], data["y_members"])
@@ -122,12 +144,17 @@ def test_shadow_beats_direct():
 
     direct = DirectMIA(use_true_label=True)
     direct.fit(
-        target, data["X_members"], data["y_members"],
-        data["X_nonmembers"], data["y_nonmembers"],
+        target,
+        data["X_members"],
+        data["y_members"],
+        data["X_nonmembers"],
+        data["y_nonmembers"],
     )
     direct_auc = direct.evaluate(
-        data["X_members"], data["X_nonmembers"],
-        data["y_members"], data["y_nonmembers"],
+        data["X_members"],
+        data["X_nonmembers"],
+        data["y_members"],
+        data["y_nonmembers"],
     )["auc"]
 
     shadow = ShadowMIA(n_shadow=4, random_state=SEED)
@@ -206,8 +233,7 @@ def test_min_k_prob_auc():
         for i, lp in enumerate(member_logps)
     ]
     non_results = [
-        mia.predict_from_log_probs(f"non_{i}", lp)
-        for i, lp in enumerate(non_logps)
+        mia.predict_from_log_probs(f"non_{i}", lp) for i, lp in enumerate(non_logps)
     ]
 
     metrics = mia.evaluate_auc(member_results, non_results, dataset="synthetic")

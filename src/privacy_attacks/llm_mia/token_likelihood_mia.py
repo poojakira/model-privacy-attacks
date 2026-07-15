@@ -116,8 +116,7 @@ class TokenLikelihoodMIA:
         logp = np.asarray(list(token_log_probs), dtype=float)
         if logp.size < self.config.min_tokens:
             raise ValueError(
-                f"Need at least {self.config.min_tokens} tokens, "
-                f"got {logp.size}."
+                f"Need at least {self.config.min_tokens} tokens, " f"got {logp.size}."
             )
         k = max(1, int(np.ceil(self.config.k_percent * logp.size)))
         # The k smallest (lowest-probability) log-probs.
