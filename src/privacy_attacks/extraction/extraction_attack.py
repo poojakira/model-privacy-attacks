@@ -14,7 +14,7 @@ https://arxiv.org/abs/1609.02943
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Any, Optional, Protocol
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -61,7 +61,7 @@ class ModelExtractionAttack:
             )
         self.substitute_model_cls = substitute_model_cls
         self.random_state = random_state
-        self.substitute_model_ = None
+        self.substitute_model_: Any = None
 
     def fit(
         self, target_model: _PredictModel, X_query: np.ndarray
@@ -81,9 +81,7 @@ class ModelExtractionAttack:
             raise RuntimeError("Attack must be fitted before calling predict.")
         return self.substitute_model_.predict(X)
 
-    def agreement(
-        self, target_model: _PredictModel, X_eval: np.ndarray
-    ) -> float:
+    def agreement(self, target_model: _PredictModel, X_eval: np.ndarray) -> float:
         """Fraction of ``X_eval`` where substitute and target labels match."""
         if self.substitute_model_ is None:
             raise RuntimeError("Attack must be fitted before measuring agreement.")

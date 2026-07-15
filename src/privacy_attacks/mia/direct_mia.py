@@ -20,7 +20,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 
 # A target model only needs to expose ``predict_proba``; we type it loosely.
-from typing import Any, Protocol
+from typing import Protocol
 
 
 class _ProbaModel(Protocol):
@@ -67,9 +67,28 @@ class DirectMIA:
         """Return a per-sample confidence score in ``[0, 1]``."""
         proba = np.asarray(model.predict_proba(X))
         if self.use_true_label and y is not None:
-            y = np.asarray(y).astype(int)
-            return proba[np.arange(proba.shape[0]), y]
+            indices = self._class_indices(model, y, proba.shape[1])
+            return proba[np.arange(proba.shape[0]), indices]
         return proba.max(axis=1)
+
+    @staticmethod
+    def _class_indices(model: _ProbaModel, y: np.ndarray, n_classes: int) -> np.ndarray:
+        """Map model class labels to probability-column indices."""
+        labels = np.asarray(y)
+        classes = getattr(model, "classes_", None)
+        if classes is not None:
+            lookup = {label: idx for idx, label in enumerate(np.asarray(classes))}
+            try:
+                return np.asarray([lookup[label] for label in labels], dtype=int)
+            except KeyError as exc:
+                raise ValueError(
+                    f"Label {exc.args[0]!r} is not in model.classes_"
+                ) from exc
+
+        indices = labels.astype(int)
+        if np.any(indices < 0) or np.any(indices >= n_classes):
+            raise ValueError("Labels must match predict_proba column indices")
+        return indices
 
     def score_samples(
         self, X: np.ndarray, y: Optional[np.ndarray] = None
@@ -113,9 +132,7 @@ class DirectMIA:
         return self
 
     @staticmethod
-    def _best_threshold(
-        member_conf: np.ndarray, non_conf: np.ndarray
-    ) -> float:
+    def _best_threshold(member_conf: np.ndarray, non_conf: np.ndarray) -> float:
         """Threshold maximising balanced accuracy over candidate cut points."""
         candidates = np.unique(np.concatenate([member_conf, non_conf]))
         best_t, best_score = float(candidates[0]), -1.0
@@ -127,9 +144,7 @@ class DirectMIA:
                 best_score, best_t = bal, float(t)
         return best_t
 
-    def predict(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None
-    ) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Predict membership (``True`` = predicted member) for each row of ``X``."""
         if self.model_ is None or self.threshold_ is None:
             raise RuntimeError("DirectMIA must be fitted before calling predict.")
@@ -150,15 +165,13 @@ class DirectMIA:
         The AUC is threshold-independent (computed from the raw confidence
         scores); the accuracy uses the fitted threshold.
         """
-        if self.model_ is None:
+        if self.model_ is None or self.threshold_ is None:
             raise RuntimeError("DirectMIA must be fitted before evaluation.")
         member_conf = self._confidence(self.model_, X_members, y_members)
         non_conf = self._confidence(self.model_, X_nonmembers, y_nonmembers)
 
         scores = np.concatenate([member_conf, non_conf])
-        labels = np.concatenate(
-            [np.ones(len(member_conf)), np.zeros(len(non_conf))]
-        )
+        labels = np.concatenate([np.ones(len(member_conf)), np.zeros(len(non_conf))])
         auc = float(roc_auc_score(labels, scores))
 
         preds = np.concatenate(
