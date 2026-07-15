@@ -8,3 +8,6 @@ dist/
 .pytest_cache/
 .venv/
 venv/
+
+.mypy_cache/
+.ruff_cache/

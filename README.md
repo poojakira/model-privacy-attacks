@@ -8,7 +8,7 @@ extension for large language models (Min-K% Prob).
 > seed-pinned test suite (`tests/test_privacy_attacks.py`) on **synthetic data
 > (seed 42)**. These numbers measure *implementation correctness*, not
 > real-world privacy leakage. No number appears here that was not measured by a
-> test in this repository.
+> test in this repository. Dependency ranges are bounded to NumPy <3 and scikit-learn <2 to reduce major-version metric drift; this is not a lockfile.
 
 ---
 
@@ -33,15 +33,15 @@ extension for large language models (Min-K% Prob).
 ```bash
 git clone https://github.com/poojakira/model-privacy-attacks.git
 cd model-privacy-attacks
-pip install -e .            # core: numpy + scikit-learn only
-pip install -e ".[test]"     # test runner
+python -m pip install -e .            # core: numpy + scikit-learn only
+python -m python -m pip install -e ".[test]"     # test runner
 ```
 
 The core library requires **only numpy and scikit-learn**. The test suite adds pytest only through the `test` extra —
 no model downloads. The LLM demo can optionally use real GPT-2 log-probs:
 
 ```bash
-pip install -e ".[llm]"     # optional: transformers + torch
+python -m pip install -e ".[llm]"     # optional: transformers + torch
 ```
 
 ---
@@ -183,7 +183,7 @@ The baseline for every AUC is 0.50 (random guessing).
 ## Reproducing
 
 ```bash
-pip install -e ".[test]"
+python -m pip install -e ".[test]"
 pytest tests/test_privacy_attacks.py -v
 # or see the metrics printed on stdout:
 pytest tests/test_privacy_attacks.py -s
