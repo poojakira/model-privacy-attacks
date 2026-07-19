@@ -14,13 +14,11 @@ https://arxiv.org/abs/1610.05820
 
 from __future__ import annotations
 
-from typing import Optional
+# A target model only needs to expose ``predict_proba``; we type it loosely.
+from typing import Optional, Protocol
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
-
-# A target model only needs to expose ``predict_proba``; we type it loosely.
-from typing import Any, Protocol
 
 
 class _ProbaModel(Protocol):
