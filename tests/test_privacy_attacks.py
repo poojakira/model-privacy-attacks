@@ -27,6 +27,12 @@ SEED = 42
 MEASURED: dict[str, dict] = {}
 
 
+def _tpr_at_fpr(member_scores, nonmember_scores, target_fpr=0.01):
+    """Implementation check: true-positive rate when allowing target_fpr false positives."""
+    threshold = np.quantile(np.asarray(nonmember_scores, dtype=float), 1.0 - target_fpr)
+    return float(np.mean(np.asarray(member_scores, dtype=float) >= threshold))
+
+
 # ---------------------------------------------------------------------------
 # Synthetic data
 # ---------------------------------------------------------------------------
@@ -89,7 +95,10 @@ def test_direct_mia_auc():
     MEASURED["direct_mia"] = metrics
     print("\n[direct_mia]", json.dumps(metrics, indent=2))
 
+    member_scores = attack.score_samples(data["X_members"], data["y_members"])
+    nonmember_scores = attack.score_samples(data["X_nonmembers"], data["y_nonmembers"])
     assert metrics["auc"] > 0.55, metrics
+    assert _tpr_at_fpr(member_scores, nonmember_scores) > 0.02
     assert 0.0 <= metrics["accuracy"] <= 1.0
     assert metrics["n_members"] == 1000
     assert metrics["n_nonmembers"] == 1000
@@ -111,6 +120,7 @@ def test_shadow_mia_auc():
     print("\n[shadow_mia]", json.dumps(metrics, indent=2))
 
     assert metrics["auc"] > 0.55, metrics
+    assert _tpr_at_fpr(attack.predict_proba(data["X_members"]), attack.predict_proba(data["X_nonmembers"])) > 0.02
     assert metrics["n_shadow"] == 4
     assert metrics["n_members"] == 1000
 
@@ -158,7 +168,11 @@ def test_model_extraction_agreement():
     MEASURED["extraction"] = metrics
     print("\n[extraction]", json.dumps(metrics, indent=2))
 
+    target_pred = target.predict(data["X_eval"])
+    sub_pred = attack.predict(data["X_eval"])
+    extraction_scores = (target_pred == sub_pred).astype(float)
     assert agreement > 0.70, metrics
+    assert float(np.mean(extraction_scores)) > 0.55
     assert metrics["n_query"] == 2000
     assert metrics["n_eval"] == 500
 
@@ -215,6 +229,7 @@ def test_min_k_prob_auc():
     print("\n[llm_mia]", json.dumps(metrics, indent=2))
 
     assert metrics["auc"] > 0.60, metrics
+    assert metrics["tpr_at_1pct_fpr"] > 0.02, metrics
     assert metrics["method"] == "min_k_prob"
     assert metrics["n_members"] == 100
     assert metrics["n_nonmembers"] == 100
