@@ -269,3 +269,19 @@ if __name__ == "__main__":
     test_min_k_prob_auc()
     print("\n===== MEASURED METRICS (seed 42, synthetic) =====")
     print(json.dumps(MEASURED, indent=2))
+
+
+def test_model_extraction_probability_fidelity_metrics():
+    """Extraction fidelity includes probability-distance, not only agreement."""
+    data = _make_pool()
+    target = _target_model(data["X_members"], data["y_members"])
+    attack = ModelExtractionAttack(
+        substitute_model_cls="RandomForest", random_state=SEED
+    )
+    attack.fit(target, data["X_public"])
+
+    metrics = attack.fidelity_metrics(target, data["X_eval"])
+
+    assert metrics["agreement"] > 0.70
+    assert metrics["mean_kl_divergence"] >= 0.0
+    assert metrics["mean_l1_distance"] >= 0.0

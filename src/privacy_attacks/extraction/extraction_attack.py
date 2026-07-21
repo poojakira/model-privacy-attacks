@@ -28,6 +28,11 @@ class _PredictModel(Protocol):
         ...
 
 
+
+class _PredictProbaModel(_PredictModel, Protocol):
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:  # pragma: no cover
+        ...
+
 _MODEL_FACTORY = {
     "DecisionTree": lambda rs: DecisionTreeClassifier(random_state=rs),
     "RandomForest": lambda rs: RandomForestClassifier(
@@ -91,3 +96,32 @@ class ModelExtractionAttack:
         target_pred = np.asarray(target_model.predict(X_eval))
         sub_pred = self.substitute_model_.predict(X_eval)
         return float(np.mean(target_pred == sub_pred))
+
+    def probability_distance(
+        self, target_model: _PredictProbaModel, X_eval: np.ndarray
+    ) -> dict[str, float]:
+        """Mean KL divergence and L1 distance between target/substitute probabilities."""
+        if self.substitute_model_ is None:
+            raise RuntimeError("Attack must be fitted before measuring fidelity.")
+        if not hasattr(target_model, "predict_proba") or not hasattr(self.substitute_model_, "predict_proba"):
+            raise RuntimeError("Both target and substitute must expose predict_proba().")
+        X_eval = np.asarray(X_eval)
+        eps = 1e-12
+        target_proba = np.clip(np.asarray(target_model.predict_proba(X_eval), dtype=float), eps, 1.0)
+        sub_proba = np.clip(np.asarray(self.substitute_model_.predict_proba(X_eval), dtype=float), eps, 1.0)
+        target_proba = target_proba / target_proba.sum(axis=1, keepdims=True)
+        sub_proba = sub_proba / sub_proba.sum(axis=1, keepdims=True)
+        kl = np.sum(target_proba * np.log(target_proba / sub_proba), axis=1)
+        l1 = np.sum(np.abs(target_proba - sub_proba), axis=1)
+        return {
+            "mean_kl_divergence": float(np.mean(kl)),
+            "mean_l1_distance": float(np.mean(l1)),
+        }
+
+    def fidelity_metrics(
+        self, target_model: _PredictProbaModel, X_eval: np.ndarray
+    ) -> dict[str, float]:
+        """Combined label-agreement and probability-distance fidelity report."""
+        metrics = {"agreement": self.agreement(target_model, X_eval)}
+        metrics.update(self.probability_distance(target_model, X_eval))
+        return metrics
