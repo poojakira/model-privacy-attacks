@@ -1,42 +1,29 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "privacy-attacks"
-version = "0.1.0"
-description = "Membership-inference and model-extraction attacks on ML models, with an LLM Min-K% Prob extension."
+name = "model-privacy-attacks"
+version = "1.0.0"
+description = "Privacy attack detection and evaluation framework for ML models"
 readme = "README.md"
-requires-python = ">=3.9"
-license = { text = "MIT" }
-authors = [{ name = "Pooja Kiran" }]
-keywords = ["membership-inference", "model-extraction", "privacy", "machine-learning", "llm"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-]
+requires-python = ">=3.10"
+license = {text = "MIT"}
 dependencies = [
-    "numpy>=1.21",
-    "scikit-learn>=1.0",
-    "pytest>=7.0",
+    "attack-v19-core @ git+https://github.com/poojakira/attack-v19-core.git@1.0.0",
+    "mitreattack-python==3.0.3",
+    "stix2==3.0.1",
+    "pydantic==2.7.4",
 ]
 
 [project.optional-dependencies]
-# pytest is included in the core dependencies so that the advertised
-# `pip install -e .` reproduce flow can run the test suite directly.
-# This extra is retained for backward compatibility.
-test = ["pytest>=7.0"]
-# The LLM demo can optionally use HuggingFace transformers to produce real
-# per-token log-probs. It is NOT required by the core library or the tests.
-llm = ["transformers>=4.30", "torch>=2.0"]
-
-[project.urls]
-Homepage = "https://github.com/poojakira/model-privacy-attacks"
+dev = [
+    "pytest>=8.2.1",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v"
+addopts = "-ra"
