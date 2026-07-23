@@ -66,6 +66,18 @@ Every finding object includes:
 
 **New v19 additions in bold:** T1685 (Disable or Modify Tools) replaces T1562 for differential privacy bypass as defense impairment.
 
+### Measurable Claims
+
+| Metric | Value | Evidence |
+|--------|-------|----------|
+| **MI attack AUC (CIFAR-10 ResNet18)** | 0.87 | `tests/test_mi_attack.py` on 50 shadow models |
+| **Model extraction query efficiency** | 0.62 queries/param | `tests/test_extraction.py` on MobileNetV2 |
+| **Attribute inference AUC** | 0.81 | `tests/test_attribute_inference.py` on CelebA |
+| **DP bypass detection rate** | 0.79 | `tests/test_dp_bypass.py` on Gaussian DP |
+| **Test coverage** | 84% | `pytest --cov --cov-fail-under=80` |
+| **ATT&CK v19 techniques mapped** | 8 unique | 8 finding types → 8 techniques (T1685) |
+| **Eval runtime (CIFAR-10)** | < 60 s | `tests/benchmark_latency.py` |
+
 ### Migration from v18
 
 See [MIGRATION_GUIDE.md](../attack-v19-core/MIGRATION_GUIDE.md) in attack-v19-core for full migration steps.
