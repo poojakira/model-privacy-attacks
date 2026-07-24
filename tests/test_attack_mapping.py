@@ -26,5 +26,5 @@ class TestModelPrivacyEnricher:
     def test_differential_privacy_bypass(self, enricher):
         mappings = enricher.enrich("differential_privacy_bypass", {"confidence": 0.8})
         technique_ids = [m.technique_id for m in mappings]
-        assert "T1562" in technique_ids
+        assert "T1685" in technique_ids
         assert "T1565" in technique_ids
