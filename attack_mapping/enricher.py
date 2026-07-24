@@ -15,7 +15,7 @@ class ATTACKEnricher:
             "attribute_inference": ["T1552", "T1213"],
             "gradient_leakage": ["T1005", "T1557"],
             "model_inversion_pii": ["T1005", "T1078"],
-            "differential_privacy_bypass": ["T1685", "T1565"],
+            "differential_privacy_bypass": ["T1685", "T1565", "T1562"],
             "federated_learning_poisoning": ["T1195", "T1565"],
             "api_probing_extraction": ["T1190", "T1595"],
         }
