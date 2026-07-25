@@ -14,7 +14,7 @@ https://arxiv.org/abs/1609.02943
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Protocol
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -52,7 +52,7 @@ class ModelExtractionAttack:
     def __init__(
         self,
         substitute_model_cls: str = "DecisionTree",
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
     ) -> None:
         if substitute_model_cls not in _MODEL_FACTORY:
             raise ValueError(
@@ -65,7 +65,7 @@ class ModelExtractionAttack:
 
     def fit(
         self, target_model: _PredictModel, X_query: np.ndarray
-    ) -> "ModelExtractionAttack":
+    ) -> ModelExtractionAttack:
         """Query ``target_model`` on ``X_query`` and train the substitute."""
         X_query = np.asarray(X_query)
         y_target = np.asarray(target_model.predict(X_query))
