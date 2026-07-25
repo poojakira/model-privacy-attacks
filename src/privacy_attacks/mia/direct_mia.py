@@ -14,13 +14,11 @@ https://arxiv.org/abs/1610.05820
 
 from __future__ import annotations
 
-from typing import Optional
+# A target model only needs to expose ``predict_proba``; we type it loosely.
+from typing import Protocol
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
-
-# A target model only needs to expose ``predict_proba``; we type it loosely.
-from typing import Any, Protocol
 
 
 class _ProbaModel(Protocol):
@@ -47,13 +45,13 @@ class DirectMIA:
 
     def __init__(
         self,
-        threshold: Optional[float] = None,
+        threshold: float | None = None,
         use_true_label: bool = True,
     ) -> None:
         self.threshold = threshold
         self.use_true_label = use_true_label
-        self.model_: Optional[_ProbaModel] = None
-        self.threshold_: Optional[float] = None
+        self.model_: _ProbaModel | None = None
+        self.threshold_: float | None = None
 
     # ------------------------------------------------------------------ #
     # Scoring
@@ -62,7 +60,7 @@ class DirectMIA:
         self,
         model: _ProbaModel,
         X: np.ndarray,
-        y: Optional[np.ndarray] = None,
+        y: np.ndarray | None = None,
     ) -> np.ndarray:
         """Return a per-sample confidence score in ``[0, 1]``."""
         proba = np.asarray(model.predict_proba(X))
@@ -72,7 +70,7 @@ class DirectMIA:
         return proba.max(axis=1)
 
     def score_samples(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None
+        self, X: np.ndarray, y: np.ndarray | None = None
     ) -> np.ndarray:
         """Confidence score used as the membership signal for each sample."""
         if self.model_ is None:
@@ -86,10 +84,10 @@ class DirectMIA:
         self,
         target_model: _ProbaModel,
         X_members: np.ndarray,
-        y_members: Optional[np.ndarray] = None,
-        X_nonmembers: Optional[np.ndarray] = None,
-        y_nonmembers: Optional[np.ndarray] = None,
-    ) -> "DirectMIA":
+        y_members: np.ndarray | None = None,
+        X_nonmembers: np.ndarray | None = None,
+        y_nonmembers: np.ndarray | None = None,
+    ) -> DirectMIA:
         """Register the target model and select a threshold.
 
         Only ``target_model`` and ``X_members`` are required.  Supplying
@@ -128,7 +126,7 @@ class DirectMIA:
         return best_t
 
     def predict(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None
+        self, X: np.ndarray, y: np.ndarray | None = None
     ) -> np.ndarray:
         """Predict membership (``True`` = predicted member) for each row of ``X``."""
         if self.model_ is None or self.threshold_ is None:
@@ -142,8 +140,8 @@ class DirectMIA:
         self,
         X_members: np.ndarray,
         X_nonmembers: np.ndarray,
-        y_members: Optional[np.ndarray] = None,
-        y_nonmembers: Optional[np.ndarray] = None,
+        y_members: np.ndarray | None = None,
+        y_nonmembers: np.ndarray | None = None,
     ) -> dict[str, float]:
         """Compute attack AUC and accuracy on a labelled member/non-member set.
 

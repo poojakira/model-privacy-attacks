@@ -16,7 +16,7 @@ https://arxiv.org/abs/1610.05820
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Protocol
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -39,7 +39,7 @@ _MODEL_FACTORY = {
 }
 
 
-def _make_model(name: str, random_state: Optional[int]):
+def _make_model(name: str, random_state: int | None):
     if name not in _MODEL_FACTORY:
         raise ValueError(
             f"Unknown model '{name}'. Choose from {sorted(_MODEL_FACTORY)}."
@@ -68,7 +68,7 @@ class ShadowMIA:
         n_shadow: int = 4,
         shadow_model_cls: str = "RandomForest",
         attack_model_cls: str = "RandomForest",
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
     ) -> None:
         self.n_shadow = n_shadow
         self.shadow_model_cls = shadow_model_cls
@@ -76,8 +76,8 @@ class ShadowMIA:
         self.random_state = random_state
 
         self.attack_model_ = None
-        self.target_model_: Optional[_ProbaModel] = None
-        self.n_features_: Optional[int] = None
+        self.target_model_: _ProbaModel | None = None
+        self.n_features_: int | None = None
 
     # ------------------------------------------------------------------ #
     # Feature construction
@@ -100,7 +100,7 @@ class ShadowMIA:
         X_public: np.ndarray,
         y_public: np.ndarray,
         target_model: _ProbaModel,
-    ) -> "ShadowMIA":
+    ) -> ShadowMIA:
         """Train shadow models + attack classifier and register the target."""
         X_public = np.asarray(X_public)
         y_public = np.asarray(y_public)
