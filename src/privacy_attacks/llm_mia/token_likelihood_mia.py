@@ -25,8 +25,8 @@ ICLR. https://arxiv.org/abs/2310.16789
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Optional, Sequence
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
@@ -102,7 +102,7 @@ class TokenLikelihoodMIA:
 
     def __init__(
         self,
-        config: Optional[TokenLikelihoodMIAConfig] = None,
+        config: TokenLikelihoodMIAConfig | None = None,
         threshold: float = -3.0,
     ) -> None:
         self.config = config or TokenLikelihoodMIAConfig()
