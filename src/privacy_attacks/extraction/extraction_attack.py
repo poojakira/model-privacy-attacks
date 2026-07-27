@@ -30,9 +30,7 @@ class _PredictModel(Protocol):
 
 _MODEL_FACTORY = {
     "DecisionTree": lambda rs: DecisionTreeClassifier(random_state=rs),
-    "RandomForest": lambda rs: RandomForestClassifier(
-        n_estimators=100, random_state=rs
-    ),
+    "RandomForest": lambda rs: RandomForestClassifier(n_estimators=100, random_state=rs),
     "LogisticRegression": lambda rs: LogisticRegression(max_iter=1000),
     "MLP": lambda rs: MLPClassifier(max_iter=500, random_state=rs),
 }
@@ -56,22 +54,17 @@ class ModelExtractionAttack:
     ) -> None:
         if substitute_model_cls not in _MODEL_FACTORY:
             raise ValueError(
-                f"Unknown model '{substitute_model_cls}'. "
-                f"Choose from {sorted(_MODEL_FACTORY)}."
+                f"Unknown model '{substitute_model_cls}'. " f"Choose from {sorted(_MODEL_FACTORY)}."
             )
         self.substitute_model_cls = substitute_model_cls
         self.random_state = random_state
         self.substitute_model_ = None
 
-    def fit(
-        self, target_model: _PredictModel, X_query: np.ndarray
-    ) -> ModelExtractionAttack:
+    def fit(self, target_model: _PredictModel, X_query: np.ndarray) -> ModelExtractionAttack:
         """Query ``target_model`` on ``X_query`` and train the substitute."""
         X_query = np.asarray(X_query)
         y_target = np.asarray(target_model.predict(X_query))
-        self.substitute_model_ = _MODEL_FACTORY[self.substitute_model_cls](
-            self.random_state
-        )
+        self.substitute_model_ = _MODEL_FACTORY[self.substitute_model_cls](self.random_state)
         self.substitute_model_.fit(X_query, y_target)
         return self
 
@@ -81,9 +74,7 @@ class ModelExtractionAttack:
             raise RuntimeError("Attack must be fitted before calling predict.")
         return self.substitute_model_.predict(X)
 
-    def agreement(
-        self, target_model: _PredictModel, X_eval: np.ndarray
-    ) -> float:
+    def agreement(self, target_model: _PredictModel, X_eval: np.ndarray) -> float:
         """Fraction of ``X_eval`` where substitute and target labels match."""
         if self.substitute_model_ is None:
             raise RuntimeError("Attack must be fitted before measuring agreement.")

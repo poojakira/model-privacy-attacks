@@ -69,9 +69,7 @@ class DirectMIA:
             return proba[np.arange(proba.shape[0]), y]
         return proba.max(axis=1)
 
-    def score_samples(
-        self, X: np.ndarray, y: np.ndarray | None = None
-    ) -> np.ndarray:
+    def score_samples(self, X: np.ndarray, y: np.ndarray | None = None) -> np.ndarray:
         """Confidence score used as the membership signal for each sample."""
         if self.model_ is None:
             raise RuntimeError("DirectMIA must be fitted before scoring.")
@@ -111,9 +109,7 @@ class DirectMIA:
         return self
 
     @staticmethod
-    def _best_threshold(
-        member_conf: np.ndarray, non_conf: np.ndarray
-    ) -> float:
+    def _best_threshold(member_conf: np.ndarray, non_conf: np.ndarray) -> float:
         """Threshold maximising balanced accuracy over candidate cut points."""
         candidates = np.unique(np.concatenate([member_conf, non_conf]))
         best_t, best_score = float(candidates[0]), -1.0
@@ -125,9 +121,7 @@ class DirectMIA:
                 best_score, best_t = bal, float(t)
         return best_t
 
-    def predict(
-        self, X: np.ndarray, y: np.ndarray | None = None
-    ) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: np.ndarray | None = None) -> np.ndarray:
         """Predict membership (``True`` = predicted member) for each row of ``X``."""
         if self.model_ is None or self.threshold_ is None:
             raise RuntimeError("DirectMIA must be fitted before calling predict.")
@@ -154,14 +148,10 @@ class DirectMIA:
         non_conf = self._confidence(self.model_, X_nonmembers, y_nonmembers)
 
         scores = np.concatenate([member_conf, non_conf])
-        labels = np.concatenate(
-            [np.ones(len(member_conf)), np.zeros(len(non_conf))]
-        )
+        labels = np.concatenate([np.ones(len(member_conf)), np.zeros(len(non_conf))])
         auc = float(roc_auc_score(labels, scores))
 
-        preds = np.concatenate(
-            [member_conf >= self.threshold_, non_conf >= self.threshold_]
-        )
+        preds = np.concatenate([member_conf >= self.threshold_, non_conf >= self.threshold_])
         accuracy = float(np.mean(preds == labels.astype(bool)))
         return {
             "auc": auc,
