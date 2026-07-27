@@ -31,9 +31,7 @@ class _ProbaModel(Protocol):
 
 
 _MODEL_FACTORY = {
-    "RandomForest": lambda rs: RandomForestClassifier(
-        n_estimators=100, random_state=rs
-    ),
+    "RandomForest": lambda rs: RandomForestClassifier(n_estimators=100, random_state=rs),
     "DecisionTree": lambda rs: DecisionTreeClassifier(random_state=rs),
     "LogisticRegression": lambda rs: LogisticRegression(max_iter=1000),
 }
@@ -41,9 +39,7 @@ _MODEL_FACTORY = {
 
 def _make_model(name: str, random_state: int | None):
     if name not in _MODEL_FACTORY:
-        raise ValueError(
-            f"Unknown model '{name}'. Choose from {sorted(_MODEL_FACTORY)}."
-        )
+        raise ValueError(f"Unknown model '{name}'. Choose from {sorted(_MODEL_FACTORY)}.")
     return _MODEL_FACTORY[name](random_state)
 
 
@@ -158,18 +154,14 @@ class ShadowMIA:
         """Predict membership (``True`` = predicted member) for each row of ``X``."""
         return self.predict_proba(X) >= 0.5
 
-    def evaluate(
-        self, X_members: np.ndarray, X_nonmembers: np.ndarray
-    ) -> dict[str, float]:
+    def evaluate(self, X_members: np.ndarray, X_nonmembers: np.ndarray) -> dict[str, float]:
         """Compute attack AUC and accuracy on a labelled member/non-member set."""
         self._check_fitted()
         member_scores = self.predict_proba(X_members)
         non_scores = self.predict_proba(X_nonmembers)
 
         scores = np.concatenate([member_scores, non_scores])
-        labels = np.concatenate(
-            [np.ones(len(member_scores)), np.zeros(len(non_scores))]
-        )
+        labels = np.concatenate([np.ones(len(member_scores)), np.zeros(len(non_scores))])
         auc = float(roc_auc_score(labels, scores))
         preds = (scores >= 0.5).astype(int)
         accuracy = float(np.mean(preds == labels.astype(int)))

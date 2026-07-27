@@ -115,10 +115,7 @@ class TokenLikelihoodMIA:
         """Compute the Min-K% Prob score from a sequence of token log-probs."""
         logp = np.asarray(list(token_log_probs), dtype=float)
         if logp.size < self.config.min_tokens:
-            raise ValueError(
-                f"Need at least {self.config.min_tokens} tokens, "
-                f"got {logp.size}."
-            )
+            raise ValueError(f"Need at least {self.config.min_tokens} tokens, " f"got {logp.size}.")
         k = max(1, int(np.ceil(self.config.k_percent * logp.size)))
         # The k smallest (lowest-probability) log-probs.
         lowest = np.sort(logp)[:k]
@@ -165,9 +162,7 @@ class TokenLikelihoodMIA:
         non_scores = np.array([r.score for r in nonmember_results], dtype=float)
 
         scores = np.concatenate([member_scores, non_scores])
-        labels = np.concatenate(
-            [np.ones(len(member_scores)), np.zeros(len(non_scores))]
-        )
+        labels = np.concatenate([np.ones(len(member_scores)), np.zeros(len(non_scores))])
         auc = float(roc_auc_score(labels, scores))
         tpr_at_1 = self._tpr_at_fpr(member_scores, non_scores, target_fpr=0.01)
         return {

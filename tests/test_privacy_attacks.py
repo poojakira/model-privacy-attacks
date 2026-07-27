@@ -122,12 +122,17 @@ def test_shadow_beats_direct():
 
     direct = DirectMIA(use_true_label=True)
     direct.fit(
-        target, data["X_members"], data["y_members"],
-        data["X_nonmembers"], data["y_nonmembers"],
+        target,
+        data["X_members"],
+        data["y_members"],
+        data["X_nonmembers"],
+        data["y_nonmembers"],
     )
     direct_auc = direct.evaluate(
-        data["X_members"], data["X_nonmembers"],
-        data["y_members"], data["y_nonmembers"],
+        data["X_members"],
+        data["X_nonmembers"],
+        data["y_members"],
+        data["y_nonmembers"],
     )["auc"]
 
     shadow = ShadowMIA(n_shadow=4, random_state=SEED)
@@ -143,9 +148,7 @@ def test_model_extraction_agreement():
     data = _make_pool()
     target = _target_model(data["X_members"], data["y_members"])
 
-    attack = ModelExtractionAttack(
-        substitute_model_cls="DecisionTree", random_state=SEED
-    )
+    attack = ModelExtractionAttack(substitute_model_cls="DecisionTree", random_state=SEED)
     attack.fit(target, data["X_public"])  # 2000 query samples
     agreement = attack.agreement(target, data["X_eval"])  # 500 eval samples
 
@@ -167,9 +170,7 @@ def test_extraction_predict_matches_agreement():
     """`predict` on the substitute is consistent with the agreement metric."""
     data = _make_pool()
     target = _target_model(data["X_members"], data["y_members"])
-    attack = ModelExtractionAttack(
-        substitute_model_cls="DecisionTree", random_state=SEED
-    )
+    attack = ModelExtractionAttack(substitute_model_cls="DecisionTree", random_state=SEED)
     attack.fit(target, data["X_public"])
 
     sub_pred = attack.predict(data["X_eval"])
@@ -202,13 +203,9 @@ def test_min_k_prob_auc():
     non_logps = _synthetic_log_probs(100, 50, mean=-3.6, std=1.5, rng=rng)
 
     member_results = [
-        mia.predict_from_log_probs(f"member_{i}", lp)
-        for i, lp in enumerate(member_logps)
+        mia.predict_from_log_probs(f"member_{i}", lp) for i, lp in enumerate(member_logps)
     ]
-    non_results = [
-        mia.predict_from_log_probs(f"non_{i}", lp)
-        for i, lp in enumerate(non_logps)
-    ]
+    non_results = [mia.predict_from_log_probs(f"non_{i}", lp) for i, lp in enumerate(non_logps)]
 
     metrics = mia.evaluate_auc(member_results, non_results, dataset="synthetic")
     MEASURED["llm_mia"] = metrics
