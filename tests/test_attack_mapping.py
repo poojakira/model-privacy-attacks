@@ -11,21 +11,22 @@ def enricher():
     return ATTACKEnricher(index)
 
 
+def mapped_ids(mappings):
+    return {m.subtechnique_id or m.technique_id for m in mappings}
+
+
 class TestModelPrivacyEnricher:
     def test_membership_inference(self, enricher):
         mappings = enricher.enrich("membership_inference_success", {"confidence": 0.9})
-        technique_ids = [m.technique_id for m in mappings]
-        assert "T1005" in technique_ids
-        assert "T1213.002" in technique_ids
+        assert "T1005" in mapped_ids(mappings)
+        assert "T1213.002" in mapped_ids(mappings)
 
     def test_model_stealing(self, enricher):
         mappings = enricher.enrich("model_stealing_detected", {"confidence": 0.85})
-        technique_ids = [m.technique_id for m in mappings]
-        assert "T1005" in technique_ids
-        assert "T1114" in technique_ids
+        assert "T1005" in mapped_ids(mappings)
+        assert "T1114" in mapped_ids(mappings)
 
     def test_differential_privacy_bypass(self, enricher):
         mappings = enricher.enrich("differential_privacy_bypass", {"confidence": 0.8})
-        technique_ids = [m.technique_id for m in mappings]
-        assert "T1685" in technique_ids
-        assert "T1565" in technique_ids
+        assert "T1685" in mapped_ids(mappings)
+        assert "T1565" in mapped_ids(mappings)

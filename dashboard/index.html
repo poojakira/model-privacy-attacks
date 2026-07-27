@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model Privacy Attacks - Leakage Operations Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101313;
+      --panel: #171e1d;
+      --panel-2: #1f2927;
+      --ink: #eef7f4;
+      --muted: #a1b5af;
+      --line: #344540;
+      --cyan: #66c7d9;
+      --green: #64d68a;
+      --amber: #e5bc57;
+      --red: #ef6c6c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .shell {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 28px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1, h2, p { margin: 0; }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 760;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      max-width: 820px;
+      line-height: 1.45;
+      font-size: 0.94rem;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .metric, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-width: 0;
+    }
+
+    .metric {
+      padding: 12px;
+      min-height: 86px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .metric em {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: normal;
+      line-height: 1.3;
+    }
+
+    .bad { color: var(--red); }
+    .warn { color: var(--amber); }
+    .good { color: var(--green); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      font-size: 0.95rem;
+      font-weight: 730;
+      margin-bottom: 10px;
+    }
+
+    .panel p {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.42;
+      margin-bottom: 10px;
+    }
+
+    .scene-wrap {
+      position: relative;
+      height: 430px;
+      border: 1px solid var(--line);
+      background: #0d1110;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #privacyFallback {
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .chartbox {
+      min-height: 310px;
+      position: relative;
+    }
+
+    canvas { max-width: 100%; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .table th, .table td {
+      text-align: left;
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 650;
+    }
+
+    .fallback-note {
+      display: none;
+      margin-top: 8px;
+      color: var(--amber);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 980px) {
+      header, .grid, .charts { grid-template-columns: 1fr; }
+      .status-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .scene-wrap { height: 360px; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 20px, 1480px); padding-top: 14px; }
+      .status-strip { grid-template-columns: 1fr; }
+      .metric strong { font-size: 1.28rem; }
+      .scene-wrap { height: 300px; }
+      .table { font-size: 0.76rem; }
+      .table th, .table td { padding: 8px 5px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>Model Privacy Attacks - Extraction and Membership Surface</h1>
+        <p class="subtitle">Operational view of membership inference, model stealing, attribute inference, gradient leakage, inversion, DP bypass, and API probing risk.</p>
+      </div>
+      <span class="pill">Static local dashboard</span>
+    </header>
+
+    <section class="status-strip" aria-label="Key model privacy indicators">
+      <div class="metric"><span>Membership inference AUC</span><strong class="bad">0.87</strong><em>CIFAR-10 ResNet18</em></div>
+      <div class="metric"><span>Extraction efficiency</span><strong class="warn">0.62</strong><em>Queries per parameter</em></div>
+      <div class="metric"><span>Attribute inference AUC</span><strong class="bad">0.81</strong><em>CelebA claim</em></div>
+      <div class="metric"><span>DP bypass detection</span><strong class="warn">0.79</strong><em>Gaussian DP gate</em></div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>3D Privacy Leakage Surface</h2>
+        <p>Rows are privacy attack families; columns are mitigation gates. Tall red cells flag higher residual leakage after the control is applied.</p>
+        <div class="scene-wrap" id="sceneHost">
+          <canvas id="privacyFallback"></canvas>
+        </div>
+        <div class="legend">
+          <span><i style="background:#64d68a"></i>Controlled</span>
+          <span><i style="background:#e5bc57"></i>Watch</span>
+          <span><i style="background:#ef6c6c"></i>Leakage risk</span>
+        </div>
+        <div class="fallback-note" id="fallbackNote">Fallback renderer active: CDN or WebGL unavailable.</div>
+      </article>
+
+      <article class="panel">
+        <h2>Privacy Response Queue</h2>
+        <table class="table">
+          <thead><tr><th>Priority</th><th>Surface</th><th>Control objective</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill bad">P0</span></td><td>Membership inference</td><td>Track train/test confidence gap and shadow-model calibration drift.</td></tr>
+            <tr><td><span class="pill bad">P0</span></td><td>Model stealing</td><td>Measure substitute fidelity against query budget and add throttling thresholds.</td></tr>
+            <tr><td><span class="pill warn">P1</span></td><td>Gradient leakage</td><td>Validate clipping, aggregation, and secure transport assumptions.</td></tr>
+            <tr><td><span class="pill warn">P1</span></td><td>DP bypass</td><td>Gate deployments on empirical attack replay, not epsilon accounting alone.</td></tr>
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="charts">
+      <article class="panel chartbox">
+        <h2>Attack Effectiveness</h2>
+        <canvas id="effectChart" height="230"></canvas>
+        <div id="effectFallback"></div>
+      </article>
+      <article class="panel chartbox">
+        <h2>ATT&amp;CK v19 Exposure Map</h2>
+        <canvas id="techniqueChart" height="230"></canvas>
+        <div id="techniqueFallback"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const attacks = ["Membership", "Extraction", "Attribute", "Gradient", "Inversion", "DP bypass", "API probing"];
+    const controls = ["Calibration", "Rate limit", "DP noise", "Aggregation", "Auditing"];
+    const riskGrid = [
+      [87, 61, 58, 49, 74],
+      [72, 82, 54, 47, 68],
+      [81, 59, 55, 52, 65],
+      [76, 45, 58, 83, 70],
+      [73, 57, 61, 54, 71],
+      [78, 48, 86, 60, 69],
+      [66, 84, 48, 42, 63]
+    ];
+
+    function colorFor(value) {
+      if (value >= 75) return 0xef6c6c;
+      if (value >= 58) return 0xe5bc57;
+      return 0x64d68a;
+    }
+
+    function hasWebGL() {
+      try {
+        const canvas = document.createElement("canvas");
+        return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function drawFallbackSurface() {
+      const canvas = document.getElementById("privacyFallback");
+      const host = document.getElementById("sceneHost");
+      const note = document.getElementById("fallbackNote");
+      canvas.style.display = "block";
+      note.style.display = "block";
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = host.clientWidth * dpr;
+      canvas.height = host.clientHeight * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = "#0d1110";
+      ctx.fillRect(0, 0, host.clientWidth, host.clientHeight);
+      const cellW = Math.max(22, (host.clientWidth - 126) / controls.length);
+      const cellH = Math.max(22, (host.clientHeight - 88) / attacks.length);
+      attacks.forEach((row, y) => {
+        ctx.fillStyle = "#a1b5af";
+        ctx.font = "12px system-ui";
+        ctx.fillText(row, 10, 58 + y * cellH);
+        controls.forEach((col, x) => {
+          const value = riskGrid[y][x];
+          ctx.fillStyle = value >= 75 ? "#ef6c6c" : value >= 58 ? "#e5bc57" : "#64d68a";
+          ctx.globalAlpha = 0.35 + value / 160;
+          ctx.fillRect(98 + x * cellW, 42 + y * cellH, cellW - 8, cellH - 8);
+          ctx.globalAlpha = 1;
+        });
+      });
+      controls.forEach((col, x) => {
+        ctx.fillStyle = "#a1b5af";
+        ctx.fillText(col, 104 + x * cellW, 24);
+      });
+    }
+
+    function renderPrivacyScene() {
+      const host = document.getElementById("sceneHost");
+      if (!window.THREE || !hasWebGL()) {
+        drawFallbackSurface();
+        return;
+      }
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0d1110);
+      const camera = new THREE.PerspectiveCamera(42, host.clientWidth / host.clientHeight, 0.1, 1000);
+      camera.position.set(6.3, 6.8, 8.9);
+      camera.lookAt(0.2, 0, -0.2);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(host.clientWidth, host.clientHeight);
+      host.appendChild(renderer.domElement);
+
+      scene.add(new THREE.HemisphereLight(0xe8fffa, 0x13211e, 1.8));
+      const light = new THREE.DirectionalLight(0xffffff, 1.55);
+      light.position.set(4.5, 9, 6);
+      scene.add(light);
+
+      const base = new THREE.Mesh(
+        new THREE.BoxGeometry(controls.length + 0.7, 0.08, attacks.length + 0.7),
+        new THREE.MeshStandardMaterial({ color: 0x1f2927, roughness: 0.72 })
+      );
+      base.position.set(0, -0.08, 0);
+      scene.add(base);
+
+      riskGrid.forEach((row, z) => {
+        row.forEach((value, x) => {
+          const height = Math.max(0.14, value / 31);
+          const block = new THREE.Mesh(
+            new THREE.BoxGeometry(0.62, height, 0.62),
+            new THREE.MeshStandardMaterial({ color: colorFor(value), roughness: 0.48, metalness: 0.06 })
+          );
+          block.position.set(x - 2, height / 2, z - 3);
+          scene.add(block);
+        });
+      });
+
+      const grid = new THREE.GridHelper(8.5, 8, 0x435953, 0x293734);
+      grid.position.y = 0.01;
+      scene.add(grid);
+
+      renderer.render(scene, camera);
+      window.addEventListener("resize", () => {
+        camera.aspect = host.clientWidth / host.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(host.clientWidth, host.clientHeight);
+        renderer.render(scene, camera);
+      });
+    }
+
+    function tableFallback(targetId, labels, values, suffix) {
+      const target = document.getElementById(targetId);
+      target.innerHTML = "<table class='table'><tbody>" + labels.map((label, i) =>
+        "<tr><td>" + label + "</td><td>" + values[i] + suffix + "</td></tr>"
+      ).join("") + "</tbody></table>";
+    }
+
+    function renderCharts() {
+      const effectLabels = ["MI AUC", "Extraction q/param", "Attribute AUC", "DP bypass detection"];
+      const effectValues = [0.87, 0.62, 0.81, 0.79];
+      const techniqueLabels = ["T1005", "T1213.002", "T1552", "T1557", "T1685", "T1190", "T1595"];
+      const techniqueValues = [4, 1, 2, 1, 1, 1, 1];
+
+      if (!window.Chart) {
+        tableFallback("effectFallback", effectLabels, effectValues, "");
+        tableFallback("techniqueFallback", techniqueLabels, techniqueValues, "");
+        return;
+      }
+
+      Chart.defaults.color = "#d3e1dd";
+      Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+      new Chart(document.getElementById("effectChart"), {
+        type: "bar",
+        data: { labels: effectLabels, datasets: [{ label: "Score", data: effectValues, backgroundColor: ["#ef6c6c", "#e5bc57", "#ef6c6c", "#e5bc57"], borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 1, grid: { color: "#293734" } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+      });
+      new Chart(document.getElementById("techniqueChart"), {
+        type: "polarArea",
+        data: { labels: techniqueLabels, datasets: [{ data: techniqueValues, backgroundColor: ["#ef6c6c", "#e5bc57", "#66c7d9", "#a2a8ff", "#64d68a", "#d98fd2", "#8dd3c7"] }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: "#293734" }, suggestedMin: 0 } }, plugins: { legend: { position: "bottom" } } }
+      });
+    }
+
+    renderPrivacyScene();
+    renderCharts();
+  </script>
+</body>
+</html>
