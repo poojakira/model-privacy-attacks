@@ -1,5 +1,12 @@
+import sys
+from pathlib import Path
+
 import pytest
-from attack_core import ATTACKIndex, ATTACKLoader
+
+# Add project root to path so attack_mapping can be imported
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from attack_v19_core import ATTACKIndex, ATTACKLoader
 
 from attack_mapping.enricher import ATTACKEnricher
 

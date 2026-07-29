@@ -1,6 +1,6 @@
 import json
 
-from attack_core.models import ATTACKMapping
+from attack_v19_core.models import ATTACKMapping
 
 
 class NavigatorLayerReporter:
