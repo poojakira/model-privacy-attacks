@@ -4,9 +4,9 @@ ATT&CK Enricher for model-privacy-attacks.
 
 from typing import Any
 
-from attack_core.index import ATTACKIndex
-from attack_core.mapping import ATTACKMappingBuilder
-from attack_core.models import ATTACKMapping
+from attack_v19_core.index import ATTACKIndex
+from attack_v19_core.mapping import ATTACKMappingBuilder
+from attack_v19_core.models import ATTACKMapping
 
 
 class ATTACKEnricher:
