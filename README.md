@@ -66,18 +66,14 @@ Every finding object includes:
 
 **New v19 additions in bold:** T1685 (Disable or Modify Tools) replaces T1562 for differential privacy bypass as defense impairment.
 
-### Measurable Claims
+### Evidence Status
 
-| Metric | Value | Evidence |
-|--------|-------|----------|
-| **MI attack AUC (CIFAR-10 ResNet18)** | 0.87 | `tests/test_mi_attack.py` on 50 shadow models |
-| **Model extraction query efficiency** | 0.62 queries/param | `tests/test_extraction.py` on MobileNetV2 |
-| **Attribute inference AUC** | 0.81 | `tests/test_attribute_inference.py` on CelebA |
-| **DP bypass detection rate** | 0.79 | `tests/test_dp_bypass.py` on Gaussian DP |
-| **Test coverage** | 84% | `pytest --cov --cov-fail-under=80` |
-| **ATT&CK v19 techniques mapped** | 8 unique | 8 finding types → 8 techniques (T1685) |
-| **Eval runtime (CIFAR-10)** | < 60 s | `tests/benchmark_latency.py` |
-
+| Claim Area | Current Evidence |
+|------------|------------------|
+| Privacy attack implementations | Unit tests in `tests/test_privacy_attacks.py` exercise implemented attack paths on synthetic or toy data. |
+| ATT&CK v19 mapping | Mapping tests and reporter code are present in this repository. |
+| Public benchmark metrics | No committed CIFAR-10 ResNet18, MobileNetV2, CelebA, Gaussian-DP, or latency benchmark artifact is present. Do not cite AUC/query-efficiency/runtime numbers from this README alone. |
+| Production readiness | Not claimed. Real privacy-risk claims require target-model, dataset, split, and confidence-interval evidence. |
 ### Migration from v18
 
 See [MIGRATION_GUIDE.md](../attack-v19-core/MIGRATION_GUIDE.md) in attack-v19-core for full migration steps.
@@ -88,19 +84,3 @@ Key remappings:
 - T1070.002 → T1685.006 (Clear Linux/Mac Logs)
 - T1534 → T1684.001 (Social Engineering: Impersonation)
 - T1566.003 → T1684.002 (Social Engineering: Email Spoofing)
-<!-- engineering-update-2026-07-27 -->
-## Engineering Update - 2026-07-27
-
-Scope: Model privacy attack evaluation.
-
-Current hardening pass:
-- Build system: Makefile targets added or verified for install, lint, format, test, build, security, and verify.
-- Dashboard: Static 3D dashboard: dashboard/index.html. Serve with make dashboard.
-- ATT&CK mapping: repos that map detections now use the shared v19 mapping builder where applicable.
-- Validation: Validated: Ruff checks passed for mapping/test scope; attack mapping tests passed; dashboard JS syntax/static checks passed.
-
-Known limits:
-- Linux and GitHub Actions post-push results must be checked after this push.
-- Security scans are build targets; dependency advisories can change after this local snapshot.
-- No production-readiness or benchmark-certification claim is made from local checks alone.
-<!-- /engineering-update-2026-07-27 -->
