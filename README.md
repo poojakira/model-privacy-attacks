@@ -76,7 +76,7 @@ Every finding object includes:
 | Production readiness | Not claimed. Real privacy-risk claims require target-model, dataset, split, and confidence-interval evidence. |
 ### Migration from v18
 
-See [MIGRATION_GUIDE.md](../attack-v19-core/MIGRATION_GUIDE.md) in attack-v19-core for full migration steps.
+See the [attack-v19-core migration guide](https://github.com/poojakira/attack-v19-core/blob/main/MIGRATION_GUIDE.md) for full migration steps.
 
 Key remappings:
 - T1562, T1562.001, T1089, T1054 → T1685 (Disable or Modify Tools)

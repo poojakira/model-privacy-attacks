@@ -22,4 +22,4 @@
 - T1685 (Disable or Modify Tools) replacing revoked T1562 for privacy bypass detection
 
 ### Migration
-See [attack-v19-core MIGRATION_GUIDE.md](../attack-v19-core/MIGRATION_GUIDE.md) for full migration steps.
+See the [attack-v19-core migration guide](https://github.com/poojakira/attack-v19-core/blob/main/MIGRATION_GUIDE.md) for full migration steps.
