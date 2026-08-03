@@ -1,34 +1,24 @@
 # Runbook
 
-## Engineering Update - 2026-07-27
+How to build, test, and run this project locally.
 
-Repository: model-privacy-attacks
-Purpose: Model privacy attack evaluation
+## Commands
 
-## Build
+| Task | Command |
+|------|---------|
+| Install everything | `make install` |
+| Install attack-v19-core (local sibling) | `make install-core` |
+| Run linter | `make lint` |
+| Auto-format code | `make format` |
+| Run tests | `make test` |
+| Build package | `make build` |
+| Run security scan (bandit + pip-audit) | `make security` |
+| Run all checks | `make verify` |
+| Serve dashboard locally | `make dashboard` (opens on port 8080) |
 
-- Install: make install
-- Lint: make lint
-- Format: make format
-- Test: make test
-- Package build: make build
-- Security scan: make security
-- Full local gate: make verify
+## Notes
 
-## Dashboard
-
-Static 3D dashboard: dashboard/index.html. Serve with make dashboard.
-
-## Dependencies And Data
-
-Uses ATT&CK mapping builder and canonical v19 IDs for privacy-bypass mappings.
-
-## Validation Snapshot
-
-Validated: Ruff checks passed for mapping/test scope; attack mapping tests passed; dashboard JS syntax/static checks passed.
-
-## Operating Limits
-
-- Re-check Linux and GitHub Actions after pushing to main.
-- Treat local dashboard scores as evidence indicators, not certifications.
-- Do not cite production readiness until clean CI, dependency audit, license status, and runtime smoke tests are current.
+- `make test` depends on `attack-v19-core` being installed. It expects the sibling directory `../attack-v19-core` by default (override with `ATTACK_CORE_PATH`).
+- The dashboard at `dashboard/index.html` is a static 3D visualization. It's informational, not a test artifact.
+- After pushing to main, check that GitHub Actions CI passes on Linux. Local Windows/Mac results don't guarantee CI will pass.
+- This repo is not production-ready. Don't cite dashboard scores or local results as certifications.
