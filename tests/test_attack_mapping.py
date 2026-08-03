@@ -1,9 +1,9 @@
 import pytest
 
 attack_core = pytest.importorskip("attack_core", reason="requires attack-v19-core package")
-from attack_core import ATTACKIndex, ATTACKLoader
+from attack_core import ATTACKIndex, ATTACKLoader  # noqa: E402
 
-from attack_mapping.enricher import ATTACKEnricher
+from attack_mapping.enricher import ATTACKEnricher  # noqa: E402
 
 
 @pytest.fixture
