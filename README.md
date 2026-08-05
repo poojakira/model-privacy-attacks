@@ -6,6 +6,12 @@
 [![Python >=3.10](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## What This Is
+
+An **educational implementation** of membership inference, model extraction, attribute inference, and differential privacy bypass attack techniques. Attack paths are implemented and exercised on synthetic or toy data. No public benchmark artifacts (CIFAR-10, ResNet18, CelebA, etc.) are committed to this repository.
+
+This is useful for understanding how these attacks work, not for making evidence-backed privacy-risk assessments about specific production models. See the Evidence Status table below for what is and is not supported.
+
 ## MITRE ATT&CK v19 Coverage
 
 This repository maps all security findings to [MITRE ATT&CK v19](https://attack.mitre.org/).
