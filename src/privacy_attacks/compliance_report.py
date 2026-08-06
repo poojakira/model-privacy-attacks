@@ -7,8 +7,15 @@ Outputs structured JSON with:
   - MIA advantage score and interpretation
   - DP epsilon / delta
   - Risk level assessment
-  - EU AI Act articles triggered
+  - Potentially applicable EU AI Act articles (informational reference only —
+    not a legal determination; consult qualified legal counsel for compliance advice)
   - Recommended mitigations
+
+IMPORTANT: The EU AI Act article references in this report are provided as
+informational guidance for teams evaluating privacy risks in AI systems.
+They are NOT a legal determination of compliance or non-compliance.
+Whether the EU AI Act applies and which articles are relevant depends on
+deployment context, use case, and jurisdiction. Consult qualified legal counsel.
 """
 from __future__ import annotations
 
@@ -17,8 +24,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 
-# ── EU AI Act article triggers ─────────────────────────────────────────────────
-# Mapped from privacy risk levels based on the EU AI Act (2024/1689).
+# ── EU AI Act article references ──────────────────────────────────────────────
+# Informational reference only. Maps risk levels to potentially applicable
+# EU AI Act (2024/1689) articles for awareness. Not a legal determination.
 _EU_AI_ACT_ARTICLES: dict[str, list[dict[str, str]]] = {
     "CRITICAL": [
         {
@@ -200,9 +208,13 @@ def generate_compliance_report(
         "overall_risk_level": overall_risk,
         "eu_ai_act": {
             "regulation": "EU AI Act (2024/1689)",
-            "triggered_articles": triggered_articles,
-            "high_risk_system": overall_risk in ("HIGH", "CRITICAL"),
-            "action_required": len(triggered_articles) > 0,
+            "disclaimer": (
+                "Informational reference only — not a legal determination. "
+                "Consult qualified legal counsel for compliance advice."
+            ),
+            "reference_articles": triggered_articles,
+            "potentially_high_risk_system": overall_risk in ("HIGH", "CRITICAL"),
+            "review_recommended": len(triggered_articles) > 0,
         },
         "recommended_mitigations": _mitigations(overall_risk, epsilon),
         "notes": notes,
