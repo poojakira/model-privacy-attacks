@@ -13,11 +13,32 @@ Educational implementation of ML privacy attacks and defenses. Demonstrates memb
 | Attack | Reference | Module | Metric |
 |--------|-----------|--------|--------|
 | Yeom loss-threshold MIA | Yeom et al., IEEE CSF 2018 | `src/privacy_attacks/mia/yeom_mia.py` | MIA advantage = 0.42 (baseline = 0.10) |
-| Shokri shadow model MIA | Shokri et al., IEEE S&P 2017 | `src/privacy_attacks/mia/shadow_mia.py` | AUC on synthetic data |
+| Shokri shadow model MIA | Shokri et al., IEEE S&P 2017 | `src/privacy_attacks/mia/shadow_mia.py` | MIA advantage on synthetic data |
 | Direct confidence MIA | — | `src/privacy_attacks/mia/direct_mia.py` | TPR/FPR at threshold |
 | Fredrikson model inversion | Fredrikson et al., ACM CCS 2015 | `src/privacy_attacks/inversion/fredrikson_inversion.py` | Confidence recovered |
+| LiRA (Likelihood Ratio Attack) | Carlini et al., IEEE S&P 2022 | `src/privacy_attacks/mia/lira.py` | AUC + TPR@0.1%FPR (correct operating point) |
 | Model extraction | — | `src/privacy_attacks/extraction/extraction_attack.py` | Query budget |
 
+
+## LiRA — State-of-the-Art MIA (Carlini et al., 2022)
+
+LiRA supersedes Shokri shadow models by framing MIA as a **likelihood ratio test**:
+
+- Trains shadow models WITH and WITHOUT each target sample
+- Fits Gaussian distributions to observed confidence scores under each hypothesis  
+- Reports **TPR at 0.1% FPR** — the operationally correct metric (not balanced accuracy)
+
+`python
+from privacy_attacks.mia.lira import LiRA
+from sklearn.linear_model import LogisticRegression
+
+attack = LiRA(model_fn=LogisticRegression, n_shadow=4, seed=42)
+results = attack.run(X_pool, y_pool, X_members, y_members, X_nonmembers, y_nonmembers)
+print(results)
+# {"auc": 0.71, "advantage_tpr_minus_fpr": 0.38, "tpr_at_0.1pct_fpr": 0.012, ...}
+`
+
+> **Note:** All results are on synthetic seed-42 data. TPR@0.1%FPR will be low on synthetic data because the model is not genuinely overfitting. Run on a real overfit model (e.g. CIFAR-10 ResNet without regularization) to see meaningful leakage.
 ## Defenses
 
 | Defense | Module | Result |
