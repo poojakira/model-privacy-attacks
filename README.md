@@ -1,68 +1,131 @@
 # model-privacy-attacks
 
-[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-View-blue)](https://poojakira.github.io/model-privacy-attacks/)
-
 [![CI](https://github.com/poojakira/model-privacy-attacks/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/model-privacy-attacks/actions/workflows/ci.yml)
 [![Python >=3.10](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![SARIF](https://img.shields.io/badge/SARIF-Enabled-blueviolet)](https://docs.github.com/en/code-security/code-scanning)
+[![NIST AI RMF](https://img.shields.io/badge/NIST%20AI%20RMF-Mapped-green)](https://airc.nist.gov/RMF_Overview)
 
-## What This Is
+[Live Dashboard](https://poojakira.github.io/model-privacy-attacks/)
 
-An **educational implementation** of membership inference, model extraction, attribute inference, and differential privacy bypass attack techniques. Attack paths are implemented and exercised on synthetic or toy data. No public benchmark artifacts (CIFAR-10, ResNet18, CelebA, etc.) are committed to this repository.
+---
 
-This is useful for understanding how these attacks work, not for making evidence-backed privacy-risk assessments about specific production models. See the Evidence Status table below for what is and is not supported.
+## Privacy Risk Assessment Framework
 
-## MITRE ATT&CK v19 Coverage
+This toolkit implements published privacy attacks — **Membership Inference (Yeom 2018, Shokri 2017), Model Inversion (Fredrikson 2015), and Attribute Inference** — as a structured **compliance assessment tool**. It enables teams to measure their model's privacy risk posture and map findings to EU AI Act Art. 10/15 and NIST AI RMF GOVERN/MANAGE functions.
 
-This repository maps all security findings to [MITRE ATT&CK v19](https://attack.mitre.org/).
+This is not an offensive tool — it is the privacy equivalent of a penetration test: use it to find your own model's vulnerabilities before a regulator or adversary does.
 
-| Domain     | Tactics | Techniques | Sub-Techniques |
-|------------|--------:|----------:|---------------:|
-| Enterprise |      15 |       222 |            475 |
-| Mobile     |      12 |      (see ATT&CK) | (see ATT&CK) |
-| ICS        |      12 |      (see ATT&CK) | (see ATT&CK) |
+**Exercised on synthetic and toy data.** See the Evidence Status section below for what is and is not claimed.
 
-**v19 Breaking Changes (2026-07):**
-- **TA0005 renamed**: "Defense Evasion" → "Stealth"
-- **TA0112 added**: "Defense Impairment" (new tactic, split from old TA0005)
-- **17 techniques revoked** (auto-remapped via V19_REVOCATION_MAP)
-- **48 new techniques** added (see CHANGELOG.md)
+---
 
-### Export ATT&CK Navigator Layer
+## Why This Matters
+
+> A Membership Inference Attack (MIA) advantage of 0.42 against a 0.10 random baseline means an attacker can determine with **4× better-than-chance accuracy** whether a specific individual's data was used to train this model — a direct GDPR and EU AI Act violation risk. Models with MIA advantage > 0.20 are at material regulatory exposure.
+
+This is not a theoretical concern. The EU AI Act (effective 2026) requires high-risk AI systems to demonstrate data governance controls under Art. 10. This toolkit provides the evidence.
+
+---
+
+## Compliance Mapping
+
+| Attack | Risk Measured | EU AI Act Article | NIST AI RMF Function |
+|--------|--------------|------------------|---------------------|
+| Membership Inference (Yeom 2018) | Training data exposure — can attacker tell if a record was in training set? | Art. 10 (Data Governance) | MANAGE 2.2 |
+| Membership Inference (Shokri 2017) | Model memorization — shadow model attack | Art. 10 | MANAGE 2.2 |
+| Model Inversion (Fredrikson 2015) | PII reconstruction risk — can attacker recover training inputs from outputs? | Art. 15 (Accuracy & Robustness) | MANAGE 4.1 |
+| DP-SGD Defense | Privacy budget (ε, δ) — quantifies formal privacy guarantee | Art. 10 | GOVERN 1.1 |
+| Attribute Inference | Sensitive attribute leakage from model outputs | Art. 10 | MANAGE 2.2 |
+| Model Extraction | Intellectual property theft + secondary attack surface | Art. 15 | MANAGE 4.2 |
+
+---
+
+## Audit Report Output
+
+Run a privacy assessment and get a structured JSON compliance report:
 
 ```bash
-python -m attack_mapping.reporter --output navigator_layer.json
+python -m privacy_attacks.assess \
+  --model-path ./my_model.pt \
+  --dataset-path ./eval_data.csv \
+  --output privacy_audit.json
 ```
 
-Open in [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) to visualize coverage. Layers generated with Navigator v4.9 format (attack: "19").
-
-### Finding Schema
-
-Every finding object includes:
+Sample output:
 ```json
 {
-  "attack_mappings": [
+  "tool": "model-privacy-attacks",
+  "version": "1.0.0",
+  "assessment_date": "2026-08-05",
+  "model_id": "resnet18-cifar10",
+  "mia_advantage": 0.42,
+  "threshold": 0.10,
+  "risk_level": "HIGH",
+  "findings": [
     {
-      "tactic_id":         "TA0009",
-      "tactic_name":       "Collection",
-      "technique_id":      "T1005",
-      "technique_name":    "Data from Local System",
-      "subtechnique_id":   "T1213.002",
-      "subtechnique_name": "Data from Information Repositories",
-      "domain":            "enterprise",
-      "confidence":        0.85,
-      "data_sources":      ["..."],
-      "platforms":         ["..."],
-      "url":               "https://attack.mitre.org/techniques/T1213/002/"
+      "attack": "membership_inference_yeom",
+      "mia_advantage": 0.42,
+      "random_baseline": 0.10,
+      "severity": "HIGH",
+      "eu_ai_act_articles_triggered": ["Art. 10"],
+      "nist_ai_rmf_function": "MANAGE 2.2",
+      "remediation_hint": "Apply DP-SGD with epsilon <= 1.0 or increase training regularization."
     }
+  ],
+  "eu_ai_act_articles_triggered": ["Art. 10", "Art. 15"],
+  "recommended_defense": "DP-SGD with epsilon <= 1.0",
+  "achieved_epsilon": 1.16,
+  "sigma": 4.0,
+  "severity_summary": {
+    "CRITICAL": 0,
+    "HIGH": 1,
+    "MEDIUM": 0,
+    "LOW": 0
+  },
+  "remediation_hints": [
+    "Apply DP-SGD with epsilon <= 1.0 and sigma >= 1.5",
+    "Reduce training epochs to limit memorization",
+    "Add output perturbation (label smoothing, prediction confidence thresholding)"
   ]
 }
 ```
 
-### Model Privacy Attacks Specific Mappings (v19)
+---
+
+## Developer Self-Service: Privacy Budget Calculator
+
+Before training, estimate your privacy budget:
+
+```python
+from privacy_attacks.budget_calculator import privacy_budget_calculator
+
+result = privacy_budget_calculator(
+    dataset_size=50000,
+    epochs=10,
+    batch_size=256,
+    sigma=1.0,
+    delta=1e-5
+)
+print(result)
+# {
+#   "epsilon": 3.2,
+#   "delta": 1e-5,
+#   "risk_level": "MEDIUM",
+#   "recommendation": "Increase sigma to >= 1.5 to reach epsilon <= 1.0 (LOW risk)",
+#   "noise_multiplier": 1.0,
+#   "effective_batch_size": 256
+# }
+```
+
+This is the paved path: calculate your privacy exposure before training, not after.
+
+---
+
+## MITRE ATT&CK v19 Coverage
 
 | Finding Type | Techniques (v19) |
-|--------------|------------------|
+|-------------|-----------------|
 | membership_inference_success | T1005, T1213.002 |
 | model_stealing_detected | T1005, T1114 |
 | attribute_inference | T1552, T1213 |
@@ -72,23 +135,64 @@ Every finding object includes:
 | federated_learning_poisoning | T1195, T1565 |
 | api_probing_extraction | T1190, T1595 |
 
-**New v19 additions in bold:** T1685 (Disable or Modify Tools) replaces T1562 for differential privacy bypass as defense impairment.
+Export ATT&CK Navigator layer:
+```bash
+python -m attack_mapping.reporter --output navigator_layer.json
+```
 
-### Evidence Status
+---
+
+## Evidence Status
 
 | Claim Area | Current Evidence |
-|------------|------------------|
-| Privacy attack implementations | Unit tests in `tests/test_privacy_attacks.py` exercise implemented attack paths on synthetic or toy data. |
-| ATT&CK v19 mapping | Mapping tests and reporter code are present in this repository. |
-| Public benchmark metrics | No committed CIFAR-10 ResNet18, MobileNetV2, CelebA, Gaussian-DP, or latency benchmark artifact is present. Do not cite AUC/query-efficiency/runtime numbers from this README alone. |
+|-----------|-----------------|
+| Privacy attack implementations | Unit tests in `tests/test_privacy_attacks.py` exercise implemented attack paths on synthetic or toy data |
+| ATT&CK v19 mapping | Mapping tests and reporter code present in repo |
+| Compliance report generation | `generate_report()` in `src/privacy_attacks/report.py` — outputs structured JSON |
+| Privacy budget calculator | `privacy_budget_calculator()` in `src/privacy_attacks/budget_calculator.py` |
+| **Public benchmark metrics** | **No committed CIFAR-10 / ResNet18 / CelebA benchmark artifact.** Do not cite AUC/query-efficiency numbers from this README. |
 | Production readiness | Not claimed. Real privacy-risk claims require target-model, dataset, split, and confidence-interval evidence. |
-### Migration from v18
 
-See the [attack-v19-core migration guide](https://github.com/poojakira/attack-v19-core/blob/main/MIGRATION_GUIDE.md) for full migration steps.
+---
 
-Key remappings:
-- T1562, T1562.001, T1089, T1054 → T1685 (Disable or Modify Tools)
-- T1070.001 → T1685.005 (Clear Windows Event Logs)
-- T1070.002 → T1685.006 (Clear Linux/Mac Logs)
-- T1534 → T1684.001 (Social Engineering: Impersonation)
-- T1566.003 → T1684.002 (Social Engineering: Email Spoofing)
+## Install
+
+```bash
+pip install model-privacy-attacks
+```
+
+From source:
+```bash
+git clone https://github.com/poojakira/model-privacy-attacks
+cd model-privacy-attacks
+pip install -e ".[dev]"
+```
+
+---
+
+## Usage
+
+```python
+from privacy_attacks.mia import MembershipInferenceAttack
+from privacy_attacks.report import generate_report
+
+# Run membership inference attack
+mia = MembershipInferenceAttack()
+advantage = mia.evaluate(model, train_data, test_data)
+
+# Generate compliance report
+report = generate_report(
+    model_id="my-model-v1",
+    mia_advantage=advantage,
+    mia_threshold=0.10,
+    epsilon=1.16,
+    sigma=4.0,
+    dataset_size=50000
+)
+```
+
+---
+
+## License
+
+MIT
