@@ -172,7 +172,7 @@ jobs:
           queries: +security-and-quality
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@192325c86100d080feab897ff886c34abd4c83a3
+        uses: github/codeql-action/analyze@d1ba80a13dd99fba24a470575428917156a28b43
         with:
           category: "/language:${{ matrix.language }}"
 
