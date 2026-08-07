@@ -1,3 +1,6 @@
+> ⚠️ **EDUCATIONAL IMPLEMENTATION — All results on synthetic data (random_state=42). For production privacy auditing, use [Opacus](https://github.com/pytorch/opacus) (DP training) or [Google dp-accounting](https://github.com/google/differential-privacy) (privacy accounting). This implements MIA/extraction attacks for learning purposes.**
+
+---
 # model-privacy-attacks
 
 [![CI](https://img.shields.io/github/actions/workflow/status/poojakira/model-privacy-attacks/ci.yml?branch=main&label=CI)](https://github.com/poojakira/model-privacy-attacks/actions)
