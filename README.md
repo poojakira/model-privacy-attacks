@@ -50,7 +50,7 @@ print(results)
 
 Verify the epsilon claim: `python scripts/verify_epsilon.py` → writes `results/epsilon_verification.json`
 
-## MIA Advantage — Honest Metric Explanation
+## MIA Advantage — Metric Explanation
 
 **MIA advantage = TPR - FPR** (not AUC). This is the metric used in Yeom et al. (2018).
 
