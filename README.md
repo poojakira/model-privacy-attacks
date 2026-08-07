@@ -43,7 +43,7 @@ print(results)
 
 | Defense | Module | Result |
 |---------|--------|--------|
-| DP-SGD with RDP accounting | `src/privacy_attacks/defenses/dp_sgd.py` | **epsilon=1.16 at sigma=4.0, delta=1e-5** |
+| DP-SGD with RDP accounting | `src/privacy_attacks/defenses/dp_sgd.py` | **epsilon=0.54 at sigma=4.0, delta=1e-5** (subsampled Gaussian RDP, Mironov 2019) |
 
 Verify the epsilon claim: `python scripts/verify_epsilon.py` → writes `results/epsilon_verification.json`
 
@@ -65,7 +65,7 @@ from privacy_attacks.compliance_report import generate_compliance_report, save_r
 
 report = generate_compliance_report(
     mia_advantage=0.42,
-    epsilon=1.16,
+    epsilon=0.54,
     delta=1e-5,
     model_name="my-classifier",
     random_baseline_advantage=0.10,
