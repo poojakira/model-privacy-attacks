@@ -68,7 +68,7 @@ def _rdp_sampled_gaussian(
         return sample_rate**2 * alpha / (sigma**2)
 
     # Tight bound (log-space, integer alpha treated as float)
-    log_moment = math.log(1 - sample_rate) + sample_rate / (1 - sample_rate) * math.exp(
+    math.log(1 - sample_rate) + sample_rate / (1 - sample_rate) * math.exp(
         _rdp_gaussian(alpha, sigma) + math.log(alpha)
     )
     # Simplified: use the standard approximation used in tensorflow-privacy
@@ -231,7 +231,7 @@ class DPSGD:
         sample_rate = self.batch_size / N
         total_steps = 0
 
-        for epoch in range(self.n_epochs):
+        for _epoch in range(self.n_epochs):
             indices = self._rng.permutation(N)
             for start in range(0, N, self.batch_size):
                 batch_idx = indices[start : start + self.batch_size]
