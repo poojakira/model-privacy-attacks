@@ -31,9 +31,10 @@ of scope here.
 The attack is exercised on synthetic/toy data. No real patient records or
 proprietary model weights are used.
 """
+
 from __future__ import annotations
 
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -117,9 +118,7 @@ class FredriksonInversion:
             feature_idx = int(self._rng.integers(0, self.n_features))
             delta = self._rng.uniform(-self.step_size, self.step_size)
             x_candidate = x.copy()
-            x_candidate[feature_idx] = np.clip(
-                x_candidate[feature_idx] + delta, lo, hi
-            )
+            x_candidate[feature_idx] = np.clip(x_candidate[feature_idx] + delta, lo, hi)
             candidate_conf = self._confidence(model, x_candidate)
             if candidate_conf > best_conf:
                 x = x_candidate
@@ -127,9 +126,7 @@ class FredriksonInversion:
 
         return x, best_conf
 
-    def run(
-        self, model: _ConfidenceModel
-    ) -> tuple[np.ndarray, float]:
+    def run(self, model: _ConfidenceModel) -> tuple[np.ndarray, float]:
         """Run the inversion attack.
 
         Parameters
@@ -157,9 +154,7 @@ class FredriksonInversion:
         assert best_x is not None
         return best_x, best_conf
 
-    def inversion_report(
-        self, model: _ConfidenceModel
-    ) -> dict[str, Any]:
+    def inversion_report(self, model: _ConfidenceModel) -> dict[str, Any]:
         """Run attack and return a structured report dict."""
         x_reconstructed, best_confidence = self.run(model)
         lo, hi = self.feature_bounds

@@ -203,9 +203,7 @@ def privacy_budget_calculator(
     if batch_size <= 0:
         raise ValueError(f"batch_size must be positive, got {batch_size}")
     if batch_size > dataset_size:
-        raise ValueError(
-            f"batch_size ({batch_size}) cannot exceed dataset_size ({dataset_size})"
-        )
+        raise ValueError(f"batch_size ({batch_size}) cannot exceed dataset_size ({dataset_size})")
     if sigma <= 0:
         raise ValueError(f"sigma must be positive, got {sigma}")
     if not 0 < delta < 1:
@@ -265,7 +263,9 @@ Examples:
     --dataset-size 50000 --epochs 10 --batch-size 256 --sigma 2.0
         """,
     )
-    parser.add_argument("--dataset-size", type=int, required=True, help="Number of training examples")
+    parser.add_argument(
+        "--dataset-size", type=int, required=True, help="Number of training examples"
+    )
     parser.add_argument("--epochs", type=int, required=True, help="Number of training epochs")
     parser.add_argument("--batch-size", type=int, required=True, help="Mini-batch size")
     parser.add_argument("--sigma", type=float, required=True, help="DP-SGD noise multiplier")

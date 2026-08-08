@@ -127,34 +127,38 @@ def generate_report(
     # DP defense finding (if applicable)
     if epsilon is not None:
         dp_risk = "LOW" if epsilon <= 1.0 else ("MEDIUM" if epsilon <= 3.0 else "HIGH")
-        findings.append({
-            "attack": "dp_sgd_defense_assessment",
-            "achieved_epsilon": round(epsilon, 4),
-            "sigma": round(sigma, 4) if sigma is not None else None,
-            "risk_level": dp_risk,
-            "eu_ai_act_articles_triggered": ["Art. 10"],
-            "nist_ai_rmf_function": "GOVERN 1.1",
-            "remediation_hint": (
-                f"Epsilon = {epsilon:.2f}. Target epsilon <= 1.0 for strong privacy guarantees. "
-                f"Increase sigma (current: {sigma}) or reduce training epochs."
-                if epsilon > 1.0
-                else f"Epsilon = {epsilon:.2f} meets the recommended threshold of <= 1.0."
-            ),
-        })
+        findings.append(
+            {
+                "attack": "dp_sgd_defense_assessment",
+                "achieved_epsilon": round(epsilon, 4),
+                "sigma": round(sigma, 4) if sigma is not None else None,
+                "risk_level": dp_risk,
+                "eu_ai_act_articles_triggered": ["Art. 10"],
+                "nist_ai_rmf_function": "GOVERN 1.1",
+                "remediation_hint": (
+                    f"Epsilon = {epsilon:.2f}. Target epsilon <= 1.0 for strong privacy guarantees. "
+                    f"Increase sigma (current: {sigma}) or reduce training epochs."
+                    if epsilon > 1.0
+                    else f"Epsilon = {epsilon:.2f} meets the recommended threshold of <= 1.0."
+                ),
+            }
+        )
 
     # Model inversion finding (if applicable)
     if has_model_inversion:
-        findings.append({
-            "attack": "model_inversion",
-            "severity": "HIGH",
-            "eu_ai_act_articles_triggered": ["Art. 15"],
-            "nist_ai_rmf_function": "MANAGE 4.1",
-            "mitre_technique": "T1005",
-            "remediation_hint": (
-                "Model inversion succeeded. Apply prediction confidence thresholding, "
-                "output perturbation, or restrict API access to top-k predictions only."
-            ),
-        })
+        findings.append(
+            {
+                "attack": "model_inversion",
+                "severity": "HIGH",
+                "eu_ai_act_articles_triggered": ["Art. 15"],
+                "nist_ai_rmf_function": "MANAGE 4.1",
+                "mitre_technique": "T1005",
+                "remediation_hint": (
+                    "Model inversion succeeded. Apply prediction confidence thresholding, "
+                    "output perturbation, or restrict API access to top-k predictions only."
+                ),
+            }
+        )
 
     # Additional caller-supplied findings
     if additional_findings:
@@ -171,11 +175,13 @@ def generate_report(
     recommended_defense = _recommend_defense(mia_advantage, mia_threshold, epsilon)
 
     # Remediation hints (deduplicated)
-    remediation_hints = list({
-        f["remediation_hint"]
-        for f in findings
-        if "remediation_hint" in f and f["remediation_hint"]
-    })
+    remediation_hints = list(
+        {
+            f["remediation_hint"]
+            for f in findings
+            if "remediation_hint" in f and f["remediation_hint"]
+        }
+    )
 
     report: dict[str, Any] = {
         "tool": "model-privacy-attacks",

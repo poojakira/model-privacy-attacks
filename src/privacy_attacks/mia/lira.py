@@ -43,6 +43,7 @@ This implementation operates on sklearn-compatible models (predict_proba).
 For neural network implementations, the same algorithm applies — shadow models
 are simply retrained on subsets of the dataset.
 """
+
 from __future__ import annotations
 
 import math
@@ -179,11 +180,15 @@ class LiRA:
         Higher = more likely member.
         """
         # Train shadow models with and without the target
-        in_scores  = self._train_shadow_models(X_pool, y_pool, x_target, y_target, include_target=True)
-        out_scores = self._train_shadow_models(X_pool, y_pool, x_target, y_target, include_target=False)
+        in_scores = self._train_shadow_models(
+            X_pool, y_pool, x_target, y_target, include_target=True
+        )
+        out_scores = self._train_shadow_models(
+            X_pool, y_pool, x_target, y_target, include_target=False
+        )
 
         # Fit Gaussians
-        mu_in,  std_in  = float(np.mean(in_scores)),  float(np.std(in_scores)  + 1e-9)
+        mu_in, std_in = float(np.mean(in_scores)), float(np.std(in_scores) + 1e-9)
         mu_out, std_out = float(np.mean(out_scores)), float(np.std(out_scores) + 1e-9)
 
         if self.fix_variance and global_var is not None:
