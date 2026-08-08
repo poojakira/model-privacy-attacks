@@ -78,11 +78,64 @@ save_report(report, "results/compliance.json")
 
 Outputs JSON with MIA advantage, epsilon, risk level, and EU AI Act articles triggered.
 
-## Install
+## Installation
+
+### Prerequisites
+- Python 3.10 or newer
+- pip (comes with Python)
+- numpy, scikit-learn (installed automatically)
+
+### Install from source
+
+```powershell
+# Windows PowerShell
+git clone https://github.com/poojakira/model-privacy-attacks.git
+cd model-privacy-attacks
+py -m pip install -e ".[dev]"
+```
 
 ```bash
+# Linux / Mac
+git clone https://github.com/poojakira/model-privacy-attacks.git
+cd model-privacy-attacks
 pip install -e ".[dev]"
 ```
+
+### Verify installation
+
+```powershell
+# Windows PowerShell
+py -c "from privacy_attacks.mia.yeom_mia import YeomMIA; from privacy_attacks.mia.lira import LiRA; print('OK')"
+```
+
+```bash
+# Linux / Mac
+python -c "from privacy_attacks.mia.yeom_mia import YeomMIA; from privacy_attacks.mia.lira import LiRA; print('OK')"
+```
+
+### Run tests
+
+```powershell
+# Windows PowerShell
+py -m pytest tests/ -v --cov=privacy_attacks --cov-fail-under=80
+# Expected: all tests passed
+```
+
+```bash
+# Linux / Mac
+pytest tests/ -v --cov=privacy_attacks --cov-fail-under=80
+# Expected: all tests passed
+```
+
+### Common issues
+
+| Problem | Fix |
+|---------|-----|
+| `py` not recognized (Windows) | Use `python` instead, or install Python from python.org and ensure it's on PATH |
+| `ModuleNotFoundError: No module named 'sklearn'` | Run `py -m pip install scikit-learn>=1.3` |
+| Permission denied on install | Use a virtual environment: `py -m venv .venv && .venv\Scripts\activate` |
+| `ImportError: cannot import name 'LiRA'` | Ensure you installed in editable mode (`-e .`) from the repo root |
+| Tests fail with numpy errors | Ensure numpy>=1.24: `py -m pip install --upgrade numpy` |
 
 ## ATT&CK Mapping
 
