@@ -1,13 +1,10 @@
-> ⚠️ **EDUCATIONAL IMPLEMENTATION — All results on synthetic data (random_state=42). For production privacy auditing, use [Opacus](https://github.com/pytorch/opacus) (DP training) or [Google dp-accounting](https://github.com/google/differential-privacy) (privacy accounting). This implements MIA/extraction attacks for learning purposes.**
-
----
 # model-privacy-attacks
 
 [![CI](https://img.shields.io/github/actions/workflow/status/poojakira/model-privacy-attacks/ci.yml?branch=main&label=CI)](https://github.com/poojakira/model-privacy-attacks/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Educational implementation of ML privacy attacks and defenses. Demonstrates membership inference, model inversion, and differential privacy — attacks AND mitigations together.
+ML privacy attack library. Implements membership inference, model inversion, and differential privacy — attacks AND mitigations together.
 
 > **Scope**: All results are on synthetic data (numpy seed=42). This measures implementation correctness, not real-world privacy leakage of any production model.
 
