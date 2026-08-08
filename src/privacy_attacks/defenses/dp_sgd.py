@@ -30,6 +30,7 @@ of 1000 steps at sample_rate=0.01).
 
 This matches the target claim: epsilon=1.16 at sigma=4.0.
 """
+
 from __future__ import annotations
 
 import math
@@ -37,15 +38,15 @@ from typing import Any
 
 import numpy as np
 
-
 # ── RDP accounting ─────────────────────────────────────────────────────────────
+
 
 def _rdp_gaussian(alpha: float, sigma: float, sensitivity: float = 1.0) -> float:
     """RDP epsilon for the Gaussian mechanism at order alpha.
 
     eps_RDP(alpha) = alpha / (2 * sigma^2)  for sensitivity=1.
     """
-    return alpha * (sensitivity ** 2) / (2.0 * sigma ** 2)
+    return alpha * (sensitivity**2) / (2.0 * sigma**2)
 
 
 def _rdp_sampled_gaussian(
@@ -64,24 +65,19 @@ def _rdp_sampled_gaussian(
     """
     if alpha < 2:
         # For alpha in (1,2) use the general composition bound
-        return sample_rate ** 2 * alpha / (sigma ** 2)
+        return sample_rate**2 * alpha / (sigma**2)
 
     # Tight bound (log-space, integer alpha treated as float)
-    log_moment = (
-        math.log(1 - sample_rate)
-        + sample_rate / (1 - sample_rate) * math.exp(
-            _rdp_gaussian(alpha, sigma) + math.log(alpha)
-        )
+    log_moment = math.log(1 - sample_rate) + sample_rate / (1 - sample_rate) * math.exp(
+        _rdp_gaussian(alpha, sigma) + math.log(alpha)
     )
     # Simplified: use the standard approximation used in tensorflow-privacy
     # eps_RDP ≈ log(1 + q^2 * (exp(eps_G(alpha)) - 1) * alpha)  / (alpha-1)
     eps_g = _rdp_gaussian(alpha, sigma)
     try:
-        result = math.log1p(
-            sample_rate ** 2 * (math.exp(eps_g) - 1)
-        ) * alpha / max(alpha - 1, 1e-9)
+        result = math.log1p(sample_rate**2 * (math.exp(eps_g) - 1)) * alpha / max(alpha - 1, 1e-9)
     except (OverflowError, ValueError):
-        result = sample_rate ** 2 * alpha / (sigma ** 2)
+        result = sample_rate**2 * alpha / (sigma**2)
     return result
 
 
@@ -93,7 +89,9 @@ def _rdp_to_dp(rdp_eps: float, alpha: float, delta: float) -> float:
     """
     if alpha <= 1.0:
         return float("inf")
-    return rdp_eps + (math.log(1.0 / delta) + math.log(alpha / (alpha - 1.0)) - 1.0 / alpha) / (alpha - 1.0)
+    return rdp_eps + (math.log(1.0 / delta) + math.log(alpha / (alpha - 1.0)) - 1.0 / alpha) / (
+        alpha - 1.0
+    )
 
 
 def compute_epsilon(
@@ -144,6 +142,7 @@ def compute_epsilon(
 
 
 # ── DP-SGD training loop ───────────────────────────────────────────────────────
+
 
 class DPSGD:
     """DP-SGD wrapper for scikit-learn style models using per-sample clipping.
@@ -211,9 +210,7 @@ class DPSGD:
         noise = self._rng.normal(0, noise_std, size=grad_sum.shape)
         return (grad_sum + noise) / batch_size
 
-    def fit(
-        self, X: np.ndarray, y: np.ndarray
-    ) -> tuple[np.ndarray, dict[str, Any]]:
+    def fit(self, X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """Train a linear classifier with DP-SGD.
 
         Uses logistic loss on a binary classification task (y in {0, 1}).
@@ -237,14 +234,14 @@ class DPSGD:
         for epoch in range(self.n_epochs):
             indices = self._rng.permutation(N)
             for start in range(0, N, self.batch_size):
-                batch_idx = indices[start: start + self.batch_size]
+                batch_idx = indices[start : start + self.batch_size]
                 X_batch = X[batch_idx]
                 y_batch = y[batch_idx]
                 actual_batch = len(batch_idx)
 
                 # Per-sample gradient computation + clipping
                 grad_sum = np.zeros(d)
-                for xi, yi in zip(X_batch, y_batch):
+                for xi, yi in zip(X_batch, y_batch, strict=False):
                     # Logistic loss gradient: (sigmoid(w·x) - y) * x
                     score = float(np.dot(self._weights, xi))
                     pred = 1.0 / (1.0 + math.exp(-score))

@@ -30,6 +30,7 @@ MIA Advantage = TPR - FPR  (also called "balanced advantage" or "epsilon-advanta
 Random baseline advantage = 0.0 (a random classifier achieves 0 advantage).
 A well-regularised model should have advantage close to 0.
 """
+
 from __future__ import annotations
 
 from typing import Protocol
@@ -41,9 +42,7 @@ from sklearn.metrics import roc_auc_score
 class _LossModel(Protocol):
     """Minimal protocol: model exposes per-sample loss."""
 
-    def per_sample_loss(
-        self, X: np.ndarray, y: np.ndarray
-    ) -> np.ndarray: ...  # pragma: no cover
+    def per_sample_loss(self, X: np.ndarray, y: np.ndarray) -> np.ndarray: ...  # pragma: no cover
 
 
 class YeomMIA:
@@ -72,7 +71,7 @@ class YeomMIA:
         model: _LossModel,
         X_train: np.ndarray,
         y_train: np.ndarray,
-    ) -> "YeomMIA":
+    ) -> YeomMIA:
         """Calibrate the loss threshold on training data.
 
         Parameters
@@ -145,8 +144,8 @@ class YeomMIA:
         member_preds = self.predict(model, X_members, y_members)
         nonmember_preds = self.predict(model, X_nonmembers, y_nonmembers)
 
-        tpr = float(np.mean(member_preds))        # fraction of members correctly identified
-        fpr = float(np.mean(nonmember_preds))     # fraction of non-members incorrectly flagged
+        tpr = float(np.mean(member_preds))  # fraction of members correctly identified
+        fpr = float(np.mean(nonmember_preds))  # fraction of non-members incorrectly flagged
         return tpr - fpr
 
     def auc_score(
@@ -165,10 +164,12 @@ class YeomMIA:
         nonmember_losses = model.per_sample_loss(X_nonmembers, y_nonmembers)
 
         scores = np.concatenate([-member_losses, -nonmember_losses])
-        labels = np.concatenate([
-            np.ones(len(member_losses)),
-            np.zeros(len(nonmember_losses)),
-        ])
+        labels = np.concatenate(
+            [
+                np.ones(len(member_losses)),
+                np.zeros(len(nonmember_losses)),
+            ]
+        )
         return float(roc_auc_score(labels, scores))
 
     @property
