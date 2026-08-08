@@ -181,10 +181,12 @@ def run_mia_evaluation(
     shadow_member_scores = shadow_attack.predict_proba(X_train)
     shadow_non_scores = shadow_attack.predict_proba(X_test)
     shadow_all_scores = np.concatenate([shadow_member_scores, shadow_non_scores])
-    shadow_all_labels = np.concatenate([
-        np.ones(len(shadow_member_scores)),
-        np.zeros(len(shadow_non_scores)),
-    ])
+    shadow_all_labels = np.concatenate(
+        [
+            np.ones(len(shadow_member_scores)),
+            np.zeros(len(shadow_non_scores)),
+        ]
+    )
     shadow_tpr_1pct = tpr_at_fpr(shadow_all_labels, shadow_all_scores, 0.01)
     shadow_tpr_01pct = tpr_at_fpr(shadow_all_labels, shadow_all_scores, 0.001)
     shadow_fpr_arr, shadow_tpr_arr, _ = roc_curve(shadow_all_labels, shadow_all_scores)
@@ -359,7 +361,9 @@ def main() -> None:
     print(f"\n\n{'=' * 60}")
     print("BENCHMARK SUMMARY")
     print(f"{'=' * 60}")
-    print(f"\n{'Model':<22} {'Train/Test Gap':<16} {'Direct AUC':<13} {'Shadow AUC':<13} {'Advantage'}")
+    print(
+        f"\n{'Model':<22} {'Train/Test Gap':<16} {'Direct AUC':<13} {'Shadow AUC':<13} {'Advantage'}"
+    )
     print("-" * 77)
     for r in all_results:
         print(

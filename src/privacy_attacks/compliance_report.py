@@ -17,12 +17,12 @@ They are NOT a legal determination of compliance or non-compliance.
 Whether the EU AI Act applies and which articles are relevant depends on
 deployment context, use case, and jurisdiction. Consult qualified legal counsel.
 """
+
 from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
 from typing import Any
-
 
 # ── EU AI Act article references ──────────────────────────────────────────────
 # Informational reference only. Maps risk levels to potentially applicable
@@ -83,6 +83,7 @@ _EU_AI_ACT_ARTICLES: dict[str, list[dict[str, str]]] = {
     ],
     "LOW": [],
 }
+
 
 # ── Risk thresholds ─────────────────────────────────────────────────────────────
 def _mia_risk_level(advantage: float) -> str:
@@ -172,7 +173,9 @@ def generate_compliance_report(
         },
         "membership_inference": {
             "attack_method": attack_method,
-            "reference": "Yeom et al., IEEE CSF 2018" if "yeom" in attack_method.lower() else attack_method,
+            "reference": "Yeom et al., IEEE CSF 2018"
+            if "yeom" in attack_method.lower()
+            else attack_method,
             "mia_advantage": round(mia_advantage, 4),
             "random_baseline_advantage": random_baseline_advantage,
             "excess_advantage_over_baseline": excess_advantage,
@@ -198,11 +201,15 @@ def generate_compliance_report(
             "interpretation": (
                 f"epsilon={epsilon:.4f} at delta={delta} — "
                 + (
-                    "strong privacy guarantee (epsilon < 2)" if epsilon is not None and epsilon < 2
-                    else "moderate privacy guarantee" if epsilon is not None and epsilon < 5
+                    "strong privacy guarantee (epsilon < 2)"
+                    if epsilon is not None and epsilon < 2
+                    else "moderate privacy guarantee"
+                    if epsilon is not None and epsilon < 5
                     else "weak privacy guarantee — consider increasing sigma"
                 )
-            ) if epsilon is not None else "DP not applied.",
+            )
+            if epsilon is not None
+            else "DP not applied.",
             "risk_level": eps_risk,
         },
         "overall_risk_level": overall_risk,
@@ -242,15 +249,14 @@ def _mitigations(risk_level: str, epsilon: float | None) -> list[str]:
             "Notify DPO and consider suspending model deployment until remediated.",
         ]
     if epsilon is None:
-        base.append(
-            "No differential privacy applied — strongly recommended for high-risk systems."
-        )
+        base.append("No differential privacy applied — strongly recommended for high-risk systems.")
     return base
 
 
 def save_report(report: dict[str, Any], path: str) -> None:
     """Write report to a JSON file."""
     import pathlib
+
     pathlib.Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(report, fh, indent=2)
