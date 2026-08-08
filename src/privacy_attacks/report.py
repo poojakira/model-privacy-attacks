@@ -136,7 +136,7 @@ def generate_report(
                 "eu_ai_act_articles_triggered": ["Art. 10"],
                 "nist_ai_rmf_function": "GOVERN 1.1",
                 "remediation_hint": (
-                    f"Epsilon = {epsilon:.2f}. Target epsilon <= 1.0 for strong privacy guarantees. "
+                    f"Epsilon = {epsilon:.2f}. Target epsilon <= 1.0 for strong privacy guarantees. "  # noqa: E501
                     f"Increase sigma (current: {sigma}) or reduce training epochs."
                     if epsilon > 1.0
                     else f"Epsilon = {epsilon:.2f} meets the recommended threshold of <= 1.0."
