@@ -362,7 +362,7 @@ def main() -> None:
     print("BENCHMARK SUMMARY")
     print(f"{'=' * 60}")
     print(
-        f"\n{'Model':<22} {'Train/Test Gap':<16} {'Direct AUC':<13} {'Shadow AUC':<13} {'Advantage'}"
+        f"\n{'Model':<22} {'Train/Test Gap':<16} {'Direct AUC':<13} {'Shadow AUC':<13} {'Advantage'}"  # noqa: E501
     )
     print("-" * 77)
     for r in all_results:
