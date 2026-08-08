@@ -1,0 +1,121 @@
+{
+  "benchmark": "adult_income_mia",
+  "real_dataset": true,
+  "dataset_source": "UCI Adult Income via sklearn",
+  "dataset_description": "48,842 records from 1994 US Census. Contains age, education, occupation, race, sex, income (>50K or <=50K). Standard MIA benchmark in privacy literature (Shokri et al. 2017).",
+  "n_samples": 48842,
+  "n_features": 14,
+  "split_strategy": "60% train / 20% test / 20% holdout, stratified",
+  "model_type": "GradientBoostingClassifier",
+  "attack_methods": [
+    "DirectMIA (confidence-threshold)",
+    "ShadowMIA (4 shadow models)"
+  ],
+  "metrics_explanation": {
+    "auc": "Area under ROC. 0.5 = no leakage, >0.6 = exploitable privacy risk",
+    "advantage": "max(TPR - FPR) over all thresholds. Key MIA metric.",
+    "tpr_at_1pct_fpr": "True positive rate at 1% false positive rate",
+    "tpr_at_0_1pct_fpr": "True positive rate at 0.1% false positive rate"
+  },
+  "privacy_interpretation": {
+    "well_generalized": "AUC near 0.5 means model leaks minimal membership info",
+    "heavily_overfitted": "AUC > 0.6 means attacker can identify training members"
+  },
+  "results": [
+    {
+      "model_label": "well_generalized",
+      "train_accuracy": 0.8581,
+      "test_accuracy": 0.8612,
+      "generalization_gap": -0.0031,
+      "direct_mia": {
+        "auc": 0.4986,
+        "advantage": 0.0022,
+        "tpr_at_1pct_fpr": 0.0001,
+        "tpr_at_0_1pct_fpr": 0.0001,
+        "accuracy": 0.4212,
+        "threshold": 0.9465,
+        "elapsed_seconds": 2.2
+      },
+      "shadow_mia": {
+        "auc": 0.5002,
+        "advantage": 0.0033,
+        "tpr_at_1pct_fpr": 0.0069,
+        "tpr_at_0_1pct_fpr": 0.0,
+        "accuracy": 0.5448,
+        "n_shadow_models": 4,
+        "elapsed_seconds": 17.61
+      },
+      "hyperparameters": {
+        "n_estimators": 50,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "min_samples_leaf": 50,
+        "random_state": 42
+      }
+    },
+    {
+      "model_label": "moderate_overfit",
+      "train_accuracy": 0.9044,
+      "test_accuracy": 0.8743,
+      "generalization_gap": 0.0301,
+      "direct_mia": {
+        "auc": 0.5099,
+        "advantage": 0.0315,
+        "tpr_at_1pct_fpr": 0.0091,
+        "tpr_at_0_1pct_fpr": 0.0009,
+        "accuracy": 0.6717,
+        "threshold": 0.6672,
+        "elapsed_seconds": 7.92
+      },
+      "shadow_mia": {
+        "auc": 0.497,
+        "advantage": 0.0054,
+        "tpr_at_1pct_fpr": 0.0083,
+        "tpr_at_0_1pct_fpr": 0.0,
+        "accuracy": 0.6039,
+        "n_shadow_models": 4,
+        "elapsed_seconds": 17.91
+      },
+      "hyperparameters": {
+        "n_estimators": 200,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "min_samples_leaf": 5,
+        "random_state": 42
+      }
+    },
+    {
+      "model_label": "heavily_overfitted",
+      "train_accuracy": 1.0,
+      "test_accuracy": 0.8608,
+      "generalization_gap": 0.1392,
+      "direct_mia": {
+        "auc": 0.6247,
+        "advantage": 0.3297,
+        "tpr_at_1pct_fpr": 0.0128,
+        "tpr_at_0_1pct_fpr": 0.0014,
+        "accuracy": 0.8247,
+        "threshold": 0.9998,
+        "elapsed_seconds": 13.44
+      },
+      "shadow_mia": {
+        "auc": 0.5683,
+        "advantage": 0.1662,
+        "tpr_at_1pct_fpr": 0.0,
+        "tpr_at_0_1pct_fpr": 0.0,
+        "accuracy": 0.7648,
+        "n_shadow_models": 4,
+        "elapsed_seconds": 21.3
+      },
+      "hyperparameters": {
+        "n_estimators": 500,
+        "max_depth": 12,
+        "learning_rate": 0.2,
+        "min_samples_leaf": 1,
+        "random_state": 42
+      }
+    }
+  ],
+  "timestamp": "2026-08-08T06:33:58.544287+00:00",
+  "reference": "Shokri et al. 2017, IEEE S&P. arXiv:1610.05820"
+}
