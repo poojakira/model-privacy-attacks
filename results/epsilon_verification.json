@@ -1,0 +1,48 @@
+{
+  "primary": {
+    "sigma": 4.0,
+    "sample_rate": 0.01,
+    "steps": 1000,
+    "delta": 1e-05,
+    "epsilon": 0.5429,
+    "optimal_rdp_alpha": 36.0,
+    "accounting_method": "RDP (Mironov 2017 + subsampled Gaussian Mironov 2019)",
+    "interpretation": "epsilon=0.5429 at sigma=4.0, delta=1e-5. Strong privacy guarantee: an adversary gains at most e^0.5429 = 1.72x odds advantage. Subsampled Gaussian RDP bound (Mironov 2019 Theorem 3)."
+  },
+  "sensitivity_table": [
+    {
+      "sigma": 4.0,
+      "sample_rate": 0.01,
+      "steps": 1000,
+      "delta": 1e-05,
+      "epsilon": 0.5429,
+      "optimal_rdp_alpha": 36.0,
+      "accounting_method": "RDP (Mironov 2017 + subsampled Gaussian Mironov 2019)",
+      "interpretation": "epsilon=0.5429 at sigma=4.0, delta=1e-5. Strong privacy guarantee: an adversary gains at most e^0.5429 = 1.72x odds advantage. Subsampled Gaussian RDP bound (Mironov 2019 Theorem 3)."
+    },
+    {
+      "sigma": 2.0,
+      "sample_rate": 0.01,
+      "steps": 1000,
+      "delta": 1e-05,
+      "epsilon": 1.3977,
+      "optimal_rdp_alpha": 14.0
+    },
+    {
+      "sigma": 1.0,
+      "sample_rate": 0.01,
+      "steps": 1000,
+      "delta": 1e-05,
+      "epsilon": 4.281,
+      "optimal_rdp_alpha": 5.0
+    },
+    {
+      "sigma": 4.0,
+      "sample_rate": 0.005,
+      "steps": 2000,
+      "delta": 1e-05,
+      "epsilon": 0.4189,
+      "optimal_rdp_alpha": 44.0
+    }
+  ]
+}

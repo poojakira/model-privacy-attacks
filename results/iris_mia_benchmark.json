@@ -1,0 +1,22 @@
+{
+  "benchmark": "iris_mia",
+  "dataset": "sklearn.datasets.load_iris (built-in, 150 samples, 4 features, 3 classes)",
+  "model": "RandomForestClassifier(n_estimators=100, random_state=42)",
+  "split": "70/30 stratified, random_state=42",
+  "train_samples": 105,
+  "test_samples": 45,
+  "model_train_accuracy": 1.0,
+  "model_test_accuracy": 0.8889,
+  "generalization_gap": 0.1111,
+  "attack_method": "DirectMIA (confidence-threshold, Shokri et al. 2017)",
+  "attack_auc": 0.6252,
+  "attack_accuracy": 0.66,
+  "attack_threshold": 1.0,
+  "tpr": 0.7238,
+  "fpr": 0.4889,
+  "mia_advantage_tpr_minus_fpr": 0.2349,
+  "elapsed_seconds": 0.019,
+  "synthetic_data": false,
+  "real_benchmark": true,
+  "note": "This is a real benchmark on the Iris dataset. MIA advantage > 0 indicates the attack detects membership signal. Random forests with full depth tend to memorize training data, producing measurable MIA advantage."
+}
