@@ -1,0 +1,11 @@
+{
+  "mia_advantage": 0.42,
+  "random_baseline_advantage": 0.10,
+  "excess_advantage_over_baseline": 0.32,
+  "metric_note": "MIA advantage = TPR - FPR at threshold. NOT the same as AUC. Random baseline is 0.10 (not 0.0) due to class imbalance in synthetic data.",
+  "risk_level": "HIGH",
+  "dataset": "synthetic (numpy seed=42, 1000 samples, 10 features)",
+  "attack_method": "YeomMIA (loss threshold, Yeom et al. IEEE CSF 2018)",
+  "eu_ai_act_articles_triggered": ["Article 9 - Risk Management", "Article 10 - Data Governance"],
+  "honest_scope_note": "These results measure implementation correctness on synthetic data. They do not measure privacy leakage of any real model or dataset."
+}
