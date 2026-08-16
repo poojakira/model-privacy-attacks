@@ -21,52 +21,49 @@ Honest Limitations:
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+import importlib.util
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 import numpy as np
 
 try:
     import torch
-    import torch.nn as nn
-    import torch.optim as optim
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
-try:
-    from sklearn.base import BaseEstimator
-    SKLEARN_AVAILABLE = True
-except ImportError:
-    SKLEARN_AVAILABLE = False
+SKLEARN_AVAILABLE = importlib.util.find_spec("sklearn") is not None
 
 
 @dataclass
 class DPConfig:
     """Configuration for DP-SGD training."""
-    epsilon: float = 1.0          # Privacy budget (lower = more private)
-    delta: float = 1e-5           # Failure probability
-    max_grad_norm: float = 1.0    # Gradient clipping threshold
+
+    epsilon: float = 1.0  # Privacy budget (lower = more private)
+    delta: float = 1e-5  # Failure probability
+    max_grad_norm: float = 1.0  # Gradient clipping threshold
     noise_multiplier: float = 1.0  # Gaussian noise multiplier
-    batch_size: int = 256         # Training batch size
-    epochs: int = 10              # Training epochs
-    learning_rate: float = 1e-3   # Learning rate
-    accountant: str = "rdp"       # Privacy accountant: "rdp" or "gdp"
+    batch_size: int = 256  # Training batch size
+    epochs: int = 10  # Training epochs
+    learning_rate: float = 1e-3  # Learning rate
+    accountant: str = "rdp"  # Privacy accountant: "rdp" or "gdp"
 
 
 @dataclass
 class OutputPerturbationConfig:
     """Configuration for output perturbation at inference."""
-    noise_scale: float = 0.1      # Gaussian noise std dev added to logits
-    temperature: float = 1.0      # Temperature scaling for logits
-    clip_logits: float = 10.0     # Max logit value before noise
+
+    noise_scale: float = 0.1  # Gaussian noise std dev added to logits
+    temperature: float = 1.0  # Temperature scaling for logits
+    clip_logits: float = 10.0  # Max logit value before noise
 
 
 @dataclass
 class LabelSmoothingConfig:
     """Configuration for label smoothing."""
-    smoothing: float = 0.1        # Uniform label smoothing factor
+
+    smoothing: float = 0.1  # Uniform label smoothing factor
     # Alternative: smoothing towards second-best class
 
 
@@ -76,7 +73,7 @@ def compute_privacy_spent(
     steps: int,
     delta: float = 1e-5,
     accountant: str = "rdp",
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Compute (ε, δ) spent for DP-SGD.
 
     ⚠ IMPORTANT — RESEARCH APPROXIMATION, NOT PRODUCTION ACCOUNTANT ⚠
@@ -104,6 +101,7 @@ def compute_privacy_spent(
     ─────────────────────────────────────────────────────────────────────
     """
     import warnings
+
     warnings.warn(
         "compute_privacy_spent uses an approximate RDP formula, not a vetted "
         "DP accountant library. Results may underestimate epsilon. "
@@ -136,6 +134,7 @@ def compute_privacy_spent(
     elif accountant == "gdp":
         # Gaussian DP (approximate — same caveat as above)
         from scipy.stats import norm
+
         mu = np.sqrt(steps) * sample_rate / noise_multiplier
         eps = mu * norm.ppf(1 - delta) + mu**2 / 2
         return float(eps), delta
@@ -148,7 +147,7 @@ def _compute_rdp_subsample(q: float, sigma: float, steps: int, alpha: float) -> 
     """RDP for subsampled Gaussian mechanism (approximate)."""
     # Using the bound from Wang et al. (2019) "Subsampled RDP"
     if alpha == 1:
-        return float('inf')
+        return float("inf")
     return (alpha - 1) / (2 * sigma**2) + np.log(1 + q * (np.exp((alpha - 1) / (2 * sigma**2)) - 1))
 
 
@@ -160,21 +159,21 @@ def _rdp_to_dp(orders: list, rdp: np.ndarray, delta: float) -> float:
             continue
         eps_i = rdp[i] - np.log(delta) / (alpha - 1)
         eps = min(eps, eps_i)
-    return float(eps) if eps != np.inf else float('inf')
+    return float(eps) if eps != np.inf else float("inf")
 
 
 class PrivacyAccountant:
     """Track privacy budget spent during DP-SGD training."""
-    
+
     def __init__(self, config: DPConfig):
         self.config = config
         self.steps = 0
-    
+
     def step(self, batch_size: int, dataset_size: int):
         """Record a training step."""
         self.steps += 1
-    
-    def get_privacy_spent(self) -> Tuple[float, float]:
+
+    def get_privacy_spent(self) -> tuple[float, float]:
         """Get current (ε, δ) spent."""
         sample_rate = self.config.batch_size / 50000  # Approximate
         return compute_privacy_spent(
@@ -197,7 +196,7 @@ def dp_sgd_step(
     device: str = "cpu",
 ):
     """Single DP-SGD step with gradient clipping and noise addition.
-    
+
     Args:
         model: PyTorch model
         optimizer: PyTorch optimizer
@@ -207,27 +206,27 @@ def dp_sgd_step(
         max_grad_norm: Gradient clipping threshold
         noise_multiplier: Noise multiplier for Gaussian noise
         device: Device to run on
-    
+
     Returns:
         Loss value
     """
     if not TORCH_AVAILABLE:
         raise ValueError("PyTorch required for DP-SGD")
-    
+
     model.train()
     optimizer.zero_grad()
-    
+
     # Move to device
     X_batch = X_batch.to(device)
     y_batch = y_batch.to(device)
-    
+
     # Forward pass
     logits = model(X_batch)
     loss = loss_fn(logits, y_batch)
-    
+
     # Backward pass
     loss.backward()
-    
+
     # Gradient clipping (per-sample gradients)
     # In practice, use Opacus or custom per-sample gradient computation
     total_norm = 0.0
@@ -235,51 +234,51 @@ def dp_sgd_step(
         if p.grad is not None:
             param_norm = p.grad.data.norm(2)
             total_norm += param_norm.item() ** 2
-    total_norm = total_norm ** 0.5
-    
+    total_norm = total_norm**0.5
+
     clip_coef = max_grad_norm / (total_norm + 1e-6)
     if clip_coef < 1:
         for p in model.parameters():
             if p.grad is not None:
                 p.grad.data.mul_(clip_coef)
-    
+
     # Add Gaussian noise
     for p in model.parameters():
         if p.grad is not None:
             noise = torch.randn_like(p.grad) * noise_multiplier * max_grad_norm
             p.grad.data.add_(noise)
-    
+
     optimizer.step()
-    
+
     return loss.item()
 
 
 class OutputPerturbator:
     """Add calibrated noise to model outputs at inference time.
-    
+
     This is a heuristic defense - does NOT provide formal DP guarantees
     on the model parameters, but can reduce membership inference accuracy.
     """
-    
+
     def __init__(self, config: OutputPerturbationConfig):
         self.config = config
-    
+
     def perturb(self, logits: np.ndarray) -> np.ndarray:
         """Add Gaussian noise to logits and optionally clip."""
         logits = np.asarray(logits, dtype=np.float64)
-        
+
         # Clip logits to prevent extreme values
         logits = np.clip(logits, -self.config.clip_logits, self.config.clip_logits)
-        
+
         # Apply temperature scaling
         logits = logits / self.config.temperature
-        
+
         # Add Gaussian noise
         noise = np.random.normal(0, self.config.noise_scale, logits.shape)
         logits = logits + noise
-        
+
         return logits
-    
+
     def perturb_proba(self, proba: np.ndarray) -> np.ndarray:
         """Add noise to probabilities (less common, use logits instead)."""
         logits = np.log(np.clip(proba, 1e-12, 1.0))
@@ -300,34 +299,34 @@ def label_smoothing_loss(
     smoothing: float = 0.1,
 ) -> float:
     """Cross-entropy with label smoothing.
-    
+
     Reduces confidence on correct class, making member/non-member
     confidence distributions more similar.
     """
     n_classes = logits.shape[1]
-    
+
     # Create smoothed targets
     smoothed_targets = np.full_like(logits, smoothing / (n_classes - 1))
     for i, t in enumerate(targets):
         smoothed_targets[i, t] = 1 - smoothing
-    
+
     # Cross-entropy with smoothed targets
     log_probs = logits - np.log(np.sum(np.exp(logits), axis=1, keepdims=True))
     loss = -np.sum(smoothed_targets * log_probs) / logits.shape[0]
-    
+
     return loss
 
 
 class EarlyStoppingMonitor:
     """Monitor validation loss to prevent overfitting (amplifies MI signal)."""
-    
+
     def __init__(self, patience: int = 5, min_delta: float = 1e-4):
         self.patience = patience
         self.min_delta = min_delta
-        self.best_loss = float('inf')
+        self.best_loss = float("inf")
         self.counter = 0
         self.should_stop = False
-    
+
     def step(self, val_loss: float) -> bool:
         """Returns True if training should stop."""
         if val_loss < self.best_loss - self.min_delta:
@@ -349,32 +348,32 @@ def evaluate_mi_resistance(
     attack_class=None,
 ) -> dict:
     """Evaluate model's resistance to membership inference attacks.
-    
+
     Args:
         model: Trained model with predict_proba method
         X_members, y_members: Training data (members)
         X_nonmembers, y_nonmembers: Holdout data (non-members)
         attack_class: MIA attack class to use (default: DirectMIA)
-    
+
     Returns:
         Dictionary with attack AUC, accuracy, and advantage
     """
     try:
         from privacy_attacks.mia import DirectMIA
-    except ImportError:
-        raise ValueError("privacy_attacks package required for evaluation")
-    
+    except ImportError as err:
+        raise ValueError("privacy_attacks package required for evaluation") from err
+
     if attack_class is None:
         attack_class = DirectMIA
-    
+
     attack = attack_class()
     attack.fit(model, X_members, y_members, X_nonmembers, y_nonmembers)
-    
+
     eval_result = attack.evaluate(X_members, X_nonmembers, y_members, y_nonmembers)
-    
+
     # Add advantage metric (how much better than random guessing)
     advantage = abs(eval_result["accuracy"] - 0.5)
-    
+
     return {
         "attack_auc": eval_result["auc"],
         "attack_accuracy": eval_result["accuracy"],
@@ -386,14 +385,14 @@ def evaluate_mi_resistance(
 if __name__ == "__main__":
     # Quick test
     print("Testing defense configs...")
-    
+
     dp_config = DPConfig(epsilon=2.0, noise_multiplier=1.0)
     print(f"DP Config: {dp_config}")
-    
+
     output_config = OutputPerturbationConfig(noise_scale=0.05)
     print(f"Output Config: {output_config}")
-    
+
     label_config = LabelSmoothingConfig(smoothing=0.1)
     print(f"Label Config: {label_config}")
-    
+
     print("All defense configs created successfully!")
