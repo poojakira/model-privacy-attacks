@@ -6,9 +6,14 @@ import pytest
 # Add project root to path so attack_mapping can be imported
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from attack_v19_core import ATTACKIndex, ATTACKLoader
+attack_v19_core = pytest.importorskip(
+    "attack_v19_core",
+    reason="attack_v19_core is optional and not published on PyPI",
+)
+ATTACKIndex = attack_v19_core.ATTACKIndex
+ATTACKLoader = attack_v19_core.ATTACKLoader
 
-from attack_mapping.enricher import ATTACKEnricher
+from attack_mapping.enricher import ATTACKEnricher  # noqa: E402
 
 
 @pytest.fixture
