@@ -70,13 +70,11 @@ Every finding object includes:
 
 | Metric | Value | Evidence |
 |--------|-------|----------|
-| **MI attack AUC (CIFAR-10 ResNet18)** | 0.87 | `tests/test_mi_attack.py` on 50 shadow models |
-| **Model extraction query efficiency** | 0.62 queries/param | `tests/test_extraction.py` on MobileNetV2 |
-| **Attribute inference AUC** | 0.81 | `tests/test_attribute_inference.py` on CelebA |
-| **DP bypass detection rate** | 0.79 | `tests/test_dp_bypass.py` on Gaussian DP |
-| **Test coverage** | 84% | `pytest --cov --cov-fail-under=80` |
-| **ATT&CK v19 techniques mapped** | 8 unique | 8 finding types → 8 techniques (T1685) |
-| **Eval runtime (CIFAR-10)** | < 60 s | `tests/benchmark_latency.py` |
+| **Tracked pytest suite** | 18 tests | `PYTHONPATH=src pytest tests/ -q` over `tests/test_assess.py`, `tests/test_attack_mapping.py`, and `tests/test_privacy_attacks.py` |
+| **CI coverage gate** | 30% minimum | `.github/workflows/ci.yml` uses `--cov-fail-under=30` |
+| **ATT&CK v19 finding types mapped** | 8 finding types | Mapping table above; verify with `tests/test_attack_mapping.py` |
+
+No CIFAR-10, MobileNetV2, CelebA, Gaussian-DP, or latency benchmark result is claimed here unless a tracked benchmark script and generated evidence artifact are added.
 
 ### Migration from v18
 
