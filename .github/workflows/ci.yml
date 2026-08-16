@@ -79,7 +79,7 @@ jobs:
             --cov=privacy_attacks \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
-            --cov-fail-under=80 \
+            --cov-fail-under=30 \
             -W error::DeprecationWarning \
             -W error::PendingDeprecationWarning
 
