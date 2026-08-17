@@ -19,6 +19,7 @@ Operational guide for developing, testing, and running the model-privacy-attacks
 
 **Linux / macOS:**
 ```bash
+git clone https://github.com/poojakira/model-privacy-attacks.git
 cd model-privacy-attacks
 python3 -m pip install --upgrade pip
 python3 -m pip install -e ".[dev]"
@@ -26,6 +27,7 @@ python3 -m pip install -e ".[dev]"
 
 **Windows (PowerShell):**
 ```powershell
+git clone https://github.com/poojakira/model-privacy-attacks.git
 cd model-privacy-attacks
 py -m pip install --upgrade pip
 py -m pip install -e ".[dev]"
