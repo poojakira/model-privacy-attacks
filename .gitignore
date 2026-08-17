@@ -1,18 +1,21 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
 *.egg-info/
 .eggs/
 build/
 dist/
+
+# Testing
 .pytest_cache/
 .coverage
+
+# Virtual environments
 .venv/
 venv/
-venv/
-.pytest_cache/
-__pycache__/
-*.pyc
-.coverage
 test_env/
-*.egg-info
+
+# IDE
+
+# OS
