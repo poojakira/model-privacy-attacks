@@ -8,9 +8,9 @@ Evaluates membership-inference and model-inversion risk on ML classifiers, then 
 
 ## What It Does
 
-- **Membership inference** — shadow-model attack (Shokri 2017), measures whether a sample was in training
-- **Model inversion** — gradient-based reconstruction (Fredrikson 2015), measures SSIM/PSNR
-- **DP-SGD defense** — trains at configurable epsilon, shows privacy-utility tradeoff
+- **Membership inference**  -  shadow-model attack (Shokri 2017), measures whether a sample was in training
+- **Model inversion**  -  gradient-based reconstruction (Fredrikson 2015), measures SSIM/PSNR
+- **DP-SGD defense**  -  trains at configurable epsilon, shows privacy-utility tradeoff
 
 ## Privacy-Utility Tradeoff (ResNet-18, CIFAR-10)
 
@@ -18,7 +18,7 @@ Evaluates membership-inference and model-inversion risk on ML classifiers, then 
 |---------|--------------|-------------|-------|
 | ∞ (no DP) | 93.2% | 62.4% | Baseline |
 | 8.0 | 88.1% | 53.8% | Moderate defense |
-| 1.0 | 71.3% | 51.2% | Near random — defense works |
+| 1.0 | 71.3% | 51.2% | Near random  -  defense works |
 
 ## Quick Start
 
