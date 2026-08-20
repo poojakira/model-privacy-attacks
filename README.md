@@ -1,35 +1,86 @@
 # model-privacy-attacks
 
-Membership inference and model inversion attacks against ML classifiers, with DP-SGD defense measurement. Implements Shokri et al. 2017 and Fredrikson et al. 2015.
+Membership inference and model inversion attacks measuring privacy leakage from ML models, with DP-SGD defense evaluation.
 
-## What It Does
+## Key Metrics
 
-- **Membership inference** — shadow-model attack (Shokri 2017), measures whether a sample was in training
-- **Model inversion** — gradient-based reconstruction (Fredrikson 2015), measures SSIM/PSNR
-- **DP-SGD defense** — trains at configurable epsilon, shows privacy-utility tradeoff
+| Metric | Value |
+|--------|-------|
+| MIA AUC (heavily overfitted target) | 0.625 (direct), 0.568 (shadow) |
+| MIA AUC (well-generalized target) | 0.499 — no detectable leakage |
+| Model inversion quality | SSIM / PSNR measured |
+| Shadow models | 4 (Shokri et al. 2017 methodology) |
+| Defense tested | DP-SGD at configurable ε |
+| Datasets | Adult Income (48,842 records), CIFAR-10 |
 
-## Actual Results vs. Paper Claims
+## Architecture
 
-On the Adult Income dataset (UCI, 48,842 records):
+```
+┌──────────────────┐     ┌───────────────────┐     ┌─────────────────┐
+│  Target Model    │────▶│  Attack Module    │────▶│  Privacy Report │
+│  (train + eval)  │     │  MIA / Inversion  │     │  AUC, SSIM/PSNR │
+└──────────────────┘     └───────────────────┘     └─────────────────┘
+         │                        │                         │
+         ▼                        ▼                         ▼
+  Controlled overfit         Shadow model            Quantified leakage
+  levels (0–14% gap)        ensemble (×4)           vs. model condition
+```
 
-| Model Condition | Direct MIA AUC | Shadow MIA AUC | Notes |
-|----------------|---------------|---------------|-------|
-| Well-generalized (gap -0.3%) | 0.499 | 0.500 | No leakage detectable |
-| Moderate overfit (gap 3%) | 0.510 | 0.497 | Barely above random |
-| Heavily overfitted (gap 14%) | 0.625 | 0.568 | Leakage only with extreme overfitting |
+**Attack Implementations:**
 
-Papers (Shokri 2017) report AUC >0.9 on heavily overfitted models with much larger shadow model ensembles. This implementation uses 4 shadow models and achieves modest results. The attacks work as described in the literature but only produce meaningful signal when the target model is severely overfitting.
+| Attack | Paper | What It Measures |
+|--------|-------|-----------------|
+| Membership Inference (shadow) | Shokri et al. 2017 | Whether a sample was in training data |
+| Membership Inference (direct) | Yeom et al. 2018 | Loss-threshold membership test |
+| Model Inversion | Fredrikson et al. 2015 | Reconstruction of training inputs from gradients |
 
-The synthetic-data benchmark (1000 samples) shows MIA advantage of 0.42, but that result measures implementation correctness on toy data, not real privacy risk.
+**Defense:**
+- DP-SGD training at configurable privacy budget (ε)
+- Gradient clipping + Gaussian noise during training
+- Measures privacy-utility tradeoff: accuracy loss vs. MIA AUC reduction
+
+## Key Findings
+
+| Model Condition | Generalization Gap | Direct MIA AUC | Shadow MIA AUC |
+|----------------|-------------------|----------------|----------------|
+| Well-generalized | -0.3% | 0.499 | 0.500 |
+| Moderate overfit | 3% | 0.510 | 0.497 |
+| Heavy overfit | 14% | 0.625 | 0.568 |
+
+Privacy leakage is measurable only when the target model severely overfits. Well-regularized models show no exploitable membership signal — consistent with theoretical expectations that memorization drives membership inference success.
+
+Note: Published results (Shokri 2017) report AUC >0.9 using larger shadow model ensembles on more vulnerable targets. This implementation uses 4 shadow models and produces modest but directionally correct results.
 
 ## Quick Start
 
 ```bash
 git clone https://github.com/poojakira/model-privacy-attacks.git && cd model-privacy-attacks
 pip install -e ".[dev]"
-python -m privacy_attacks.evaluate --attack membership --dataset cifar10
+
+# Run membership inference attack
+python -m privacy_attacks.evaluate --attack membership --dataset adult
+
+# Run model inversion
+python -m privacy_attacks.evaluate --attack inversion --dataset cifar10
+
+# Evaluate DP-SGD defense at ε=8
+python -m privacy_attacks.evaluate --attack membership --defense dpsgd --epsilon 8.0
+
+# Run full evaluation suite
+python -m privacy_attacks.evaluate --attack all --output privacy_report.json
 ```
+
+## Relevance to AI Security
+
+Training data extraction is a primary concern for LLM deployments — memorization of PII, copyrighted content, and API keys. This implementation demonstrates the conditions under which membership inference succeeds and when it does not.
+
+The key insight: generalization gap is the strongest predictor of privacy leakage. This directly informs deployment decisions:
+- Proper regularization reduces privacy risk as a side effect
+- DP-SGD provides formal guarantees at quantifiable utility cost
+- Monitoring train/test divergence serves as a proxy for privacy risk
+
+Understanding attack-defense dynamics is necessary for building ML systems that handle sensitive data responsibly.
 
 ## License
 
-MIT.
+MIT
