@@ -56,18 +56,31 @@ Note: Published results (Shokri 2017) report AUC >0.9 using larger shadow model 
 ```bash
 git clone https://github.com/poojakira/model-privacy-attacks.git && cd model-privacy-attacks
 pip install -e ".[dev]"
+```
 
-# Run membership inference attack
-python -m privacy_attacks.evaluate --attack membership --dataset adult
+The attacks are a library. Membership inference takes a trained target model plus
+member (training) and non-member (held-out) samples:
 
-# Run model inversion
-python -m privacy_attacks.evaluate --attack inversion --dataset cifar10
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+from privacy_attacks.mia import DirectMIA
 
-# Evaluate DP-SGD defense at ε=8
-python -m privacy_attacks.evaluate --attack membership --defense dpsgd --epsilon 8.0
+X, y = make_classification(n_samples=2000, n_features=20, random_state=0)
+X_members, y_members = X[:1000], y[:1000]        # data the model trained on
+X_nonmembers, y_nonmembers = X[1000:], y[1000:]  # held-out data
 
-# Run full evaluation suite
-python -m privacy_attacks.evaluate --attack all --output privacy_report.json
+model = RandomForestClassifier(random_state=0).fit(X_members, y_members)
+
+mia = DirectMIA().fit(model, X_members, y_members, X_nonmembers, y_nonmembers)
+result = mia.evaluate(X_members, X_nonmembers, y_members, y_nonmembers)
+print("MIA AUC:", result)   # ~0.70 — the model leaks membership signal
+```
+
+Run the full attack + defense test suite:
+
+```bash
+pytest tests/ -v
 ```
 
 ## Relevance to AI Security
