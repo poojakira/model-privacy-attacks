@@ -17,7 +17,7 @@ pip install -r requirements.txt
 ## Run Membership Inference Attack (MIA)
 
 ```bash
-python run_mia.py --model models/target_model.pkl --train-data data/train.csv --test-data data/test.csv
+python -m privacy_attacks.mia --model models/target_model.pkl --train-data data/train.csv --test-data data/test.csv
 ```
 
 Output: `results/mia_report.json` — contains per-sample membership scores and aggregate AUC.
@@ -25,7 +25,7 @@ Output: `results/mia_report.json` — contains per-sample membership scores and 
 ## Run Model Inversion Attack
 
 ```bash
-python run_inversion.py --model models/target_model.pkl --target-class 1 --output results/inversion/
+python -m privacy_attacks.inversion --model models/target_model.pkl --target-class 1 --output results/inversion/
 ```
 
 Output: reconstructed feature vectors in `results/inversion/`. Visual plots saved as PNG if matplotlib is available.
