@@ -13,6 +13,7 @@ dist/
 
 # Virtual environments
 .venv/
+.venv-test/
 venv/
 test_env/
 

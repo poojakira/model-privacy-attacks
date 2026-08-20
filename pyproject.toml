@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "model-privacy-attacks"
-version = "0.1.0"
+version = "1.0.0"
 description = "Privacy attack detection and evaluation framework for ML models"
 readme = "README.md"
 requires-python = ">=3.10"
