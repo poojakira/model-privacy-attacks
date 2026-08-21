@@ -7,7 +7,7 @@ Outputs structured JSON with:
   - MIA advantage score and interpretation
   - DP epsilon / delta
   - Risk level assessment
-  - Potentially applicable EU AI Act articles (informational reference only —
+  - Potentially applicable EU AI Act articles (informational reference only  -- 
     not a legal determination; consult qualified legal counsel for compliance advice)
   - Recommended mitigations
 
@@ -36,7 +36,7 @@ _EU_AI_ACT_ARTICLES: dict[str, list[dict[str, str]]] = {
                 "Training, validation and testing data must be subject to appropriate "
                 "data governance and management practices. High-risk AI systems must "
                 "use training data free of errors and complete with respect to the "
-                "intended purpose — including privacy of individuals."
+                "intended purpose  --  including privacy of individuals."
             ),
         },
         {
@@ -199,13 +199,13 @@ def generate_compliance_report(
             "sigma": None,  # populated by caller if known
             "accounting_method": "RDP (Mironov 2017)",
             "interpretation": (
-                f"epsilon={epsilon:.4f} at delta={delta} — "
+                f"epsilon={epsilon:.4f} at delta={delta}  --  "
                 + (
                     "strong privacy guarantee (epsilon < 2)"
                     if epsilon is not None and epsilon < 2
                     else "moderate privacy guarantee"
                     if epsilon is not None and epsilon < 5
-                    else "weak privacy guarantee — consider increasing sigma"
+                    else "weak privacy guarantee  --  consider increasing sigma"
                 )
             )
             if epsilon is not None
@@ -216,7 +216,7 @@ def generate_compliance_report(
         "eu_ai_act": {
             "regulation": "EU AI Act (2024/1689)",
             "disclaimer": (
-                "Informational reference only — not a legal determination. "
+                "Informational reference only  --  not a legal determination. "
                 "Consult qualified legal counsel for compliance advice."
             ),
             "reference_articles": triggered_articles,
@@ -249,7 +249,7 @@ def _mitigations(risk_level: str, epsilon: float | None) -> list[str]:
             "Notify DPO and consider suspending model deployment until remediated.",
         ]
     if epsilon is None:
-        base.append("No differential privacy applied — strongly recommended for high-risk systems.")
+        base.append("No differential privacy applied  --  strongly recommended for high-risk systems.")
     return base
 
 

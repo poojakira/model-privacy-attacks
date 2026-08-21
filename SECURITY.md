@@ -2,7 +2,7 @@
 
 ## Overview
 
-`model-privacy-attacks` is a **privacy risk assessment framework** — it implements published academic attacks as compliance measurement tools. This policy covers responsible disclosure for vulnerabilities in the framework itself (not in third-party models assessed with it).
+`model-privacy-attacks` is a **privacy risk assessment framework**  --  it implements published academic attacks as compliance measurement tools. This policy covers responsible disclosure for vulnerabilities in the framework itself (not in third-party models assessed with it).
 
 ---
 
@@ -31,7 +31,7 @@ Vulnerabilities in this repository's own code and tooling, including:
 
 ### Out of Scope
 
-- Privacy vulnerabilities in *models you assess using this tool* — that is the tool's intended purpose, not a security bug
+- Privacy vulnerabilities in *models you assess using this tool*  --  that is the tool's intended purpose, not a security bug
 - Social engineering, phishing, or physical access
 - Issues in third-party dependencies without a disclosed CVE
 - Theoretical attacks that require pre-existing compromise of the assessment environment
@@ -66,7 +66,7 @@ Report vulnerabilities via one of the following channels:
 | Acknowledgment | 72 hours |
 | Initial triage and severity assessment | 5 business days |
 | Patch or mitigation | 14 business days for HIGH/CRITICAL |
-| Public disclosure | Coordinated — typically 90 days after report |
+| Public disclosure | Coordinated  --  typically 90 days after report |
 
 For CRITICAL vulnerabilities (e.g., silent epsilon underestimation leading to incorrect LOW classification), we will issue a patch and changelog entry within 7 business days.
 

@@ -1,4 +1,4 @@
-"""UCI Adult Income MIA Benchmark — Real Privacy Dataset.
+"""UCI Adult Income MIA Benchmark  --  Real Privacy Dataset.
 
 This script trains a GradientBoostingClassifier on the UCI Adult Income dataset
 (real census records) and evaluates membership inference attacks against it.
@@ -229,7 +229,7 @@ def run_mia_evaluation(
 def main() -> None:
     """Run the full UCI Adult Income MIA benchmark."""
     print("=" * 60)
-    print("UCI Adult Income — Membership Inference Attack Benchmark")
+    print("UCI Adult Income  --  Membership Inference Attack Benchmark")
     print("Real dataset, real privacy implications")
     print("=" * 60)
 

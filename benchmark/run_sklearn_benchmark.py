@@ -3,7 +3,7 @@
 This script trains a RandomForestClassifier on the Iris dataset (built-in,
 no downloads required) and evaluates the DirectMIA attack against it.
 
-This is NOT synthetic data — it uses a real model on a real dataset to produce
+This is NOT synthetic data  --  it uses a real model on a real dataset to produce
 actual MIA advantage metrics.
 """
 
@@ -28,7 +28,7 @@ from privacy_attacks.mia.direct_mia import DirectMIA  # noqa: E402
 def main() -> None:
     """Train model, run MIA, write results."""
     print("=" * 60)
-    print("Iris MIA Benchmark — Real Model, Real Data")
+    print("Iris MIA Benchmark  --  Real Model, Real Data")
     print("=" * 60)
 
     # ------------------------------------------------------------------
@@ -58,7 +58,7 @@ def main() -> None:
 
     train_acc = model.score(X_train, y_train)
     test_acc = model.score(X_test, y_test)
-    print(f"\nModel accuracy — Train: {train_acc:.4f}, Test: {test_acc:.4f}")
+    print(f"\nModel accuracy  --  Train: {train_acc:.4f}, Test: {test_acc:.4f}")
     print(f"Generalization gap: {train_acc - test_acc:.4f}")
 
     # ------------------------------------------------------------------

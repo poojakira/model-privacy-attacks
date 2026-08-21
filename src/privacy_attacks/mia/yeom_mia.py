@@ -21,7 +21,7 @@ on the per-sample loss to classify membership:
                      0  otherwise
 
 The default threshold is the mean training loss, as proposed in the original
-paper. This is the simplest possible MIA — it achieves non-trivial advantage
+paper. This is the simplest possible MIA  --  it achieves non-trivial advantage
 on overfit models without requiring shadow models or confidence scores.
 
 Metrics

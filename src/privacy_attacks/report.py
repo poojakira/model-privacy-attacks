@@ -18,10 +18,10 @@ def _calculate_risk_level(mia_advantage: float, threshold: float) -> str:
     Calculate risk level based on MIA advantage relative to a random baseline.
 
     Risk levels:
-      LOW      — advantage < 2x threshold (near-random guessing)
-      MEDIUM   — advantage between 2x and 3x threshold
-      HIGH     — advantage between 3x and 5x threshold
-      CRITICAL — advantage >= 5x threshold (strongly memorizing model)
+      LOW       --  advantage < 2x threshold (near-random guessing)
+      MEDIUM    --  advantage between 2x and 3x threshold
+      HIGH      --  advantage between 3x and 5x threshold
+      CRITICAL  --  advantage >= 5x threshold (strongly memorizing model)
     """
     if threshold <= 0:
         raise ValueError("threshold must be positive")
@@ -40,9 +40,9 @@ def _eu_ai_act_articles(mia_advantage: float, threshold: float, has_inversion: b
     """
     Determine which EU AI Act articles are triggered by the assessment findings.
 
-    Art. 10 — Data Governance: triggered when MIA advantage exceeds threshold
+    Art. 10  --  Data Governance: triggered when MIA advantage exceeds threshold
                (evidence of training data memorization).
-    Art. 15 — Accuracy and Robustness: triggered when model inversion risk is present
+    Art. 15  --  Accuracy and Robustness: triggered when model inversion risk is present
                (evidence that training data can be reconstructed from outputs).
     """
     articles = []
@@ -218,7 +218,7 @@ def _mia_remediation_hint(
     if epsilon is None or epsilon > 3.0:
         hints.append("Apply DP-SGD with epsilon <= 1.0 and sigma >= 1.5")
     elif epsilon > 1.0:
-        hints.append(f"Current epsilon {epsilon:.2f} exceeds target 1.0 — increase sigma")
+        hints.append(f"Current epsilon {epsilon:.2f} exceeds target 1.0  --  increase sigma")
     hints.append("Reduce training epochs to limit overfitting and memorization")
     hints.append(
         "Add output perturbation: label smoothing (smoothing=0.1) or "
@@ -234,14 +234,14 @@ def _recommend_defense(
 ) -> str:
     """Recommend the primary defense based on the assessment results."""
     if mia_advantage <= threshold:
-        return "No defense required — MIA advantage within acceptable range"
+        return "No defense required  --  MIA advantage within acceptable range"
     if epsilon is None:
         return "DP-SGD with epsilon <= 1.0 (not currently applied)"
     if epsilon > 3.0:
         return f"Increase DP-SGD sigma to achieve epsilon <= 1.0 (current epsilon: {epsilon:.2f})"
     if epsilon > 1.0:
         return f"Tune DP-SGD: increase sigma to reach epsilon <= 1.0 (current: {epsilon:.2f})"
-    return f"DP-SGD applied with epsilon = {epsilon:.2f} — meets target"
+    return f"DP-SGD applied with epsilon = {epsilon:.2f}  --  meets target"
 
 
 def save_report(report: dict[str, Any], output_path: str) -> None:

@@ -121,7 +121,7 @@ def compute_epsilon(
     Returns
     -------
     tuple[float, float]
-        ``(epsilon, optimal_alpha)`` — the tightest (eps, delta)-DP guarantee
+        ``(epsilon, optimal_alpha)``  --  the tightest (eps, delta)-DP guarantee
         and the RDP order that achieved it.
     """
     if alpha_orders is None:

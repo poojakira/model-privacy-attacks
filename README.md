@@ -7,7 +7,7 @@ Membership inference and model inversion attacks measuring privacy leakage from 
 | Metric | Value |
 |--------|-------|
 | MIA AUC (heavily overfitted target) | 0.625 (direct), 0.568 (shadow) |
-| MIA AUC (well-generalized target) | 0.499 — no detectable leakage |
+| MIA AUC (well-generalized target) | 0.499  --  no detectable leakage |
 | Model inversion quality | SSIM / PSNR measured |
 | Shadow models | 4 (Shokri et al. 2017 methodology) |
 | Defense tested | DP-SGD at configurable ε |
@@ -47,7 +47,7 @@ Membership inference and model inversion attacks measuring privacy leakage from 
 | Moderate overfit | 3% | 0.510 | 0.497 |
 | Heavy overfit | 14% | 0.625 | 0.568 |
 
-Privacy leakage is measurable only when the target model severely overfits. Well-regularized models show no exploitable membership signal — consistent with theoretical expectations that memorization drives membership inference success.
+Privacy leakage is measurable only when the target model severely overfits. Well-regularized models show no exploitable membership signal  --  consistent with theoretical expectations that memorization drives membership inference success.
 
 Note: Published results (Shokri 2017) report AUC >0.9 using larger shadow model ensembles on more vulnerable targets. This implementation uses 4 shadow models and produces modest but directionally correct results.
 
@@ -74,7 +74,7 @@ model = RandomForestClassifier(random_state=0).fit(X_members, y_members)
 
 mia = DirectMIA().fit(model, X_members, y_members, X_nonmembers, y_nonmembers)
 result = mia.evaluate(X_members, X_nonmembers, y_members, y_nonmembers)
-print("MIA AUC:", result)   # ~0.70 — the model leaks membership signal
+print("MIA AUC:", result)   # ~0.70  --  the model leaks membership signal
 ```
 
 Run the full attack + defense test suite:
@@ -85,7 +85,7 @@ pytest tests/ -v
 
 ## Relevance to AI Security
 
-Training data extraction is a primary concern for LLM deployments — memorization of PII, copyrighted content, and API keys. This implementation demonstrates the conditions under which membership inference succeeds and when it does not.
+Training data extraction is a primary concern for LLM deployments  --  memorization of PII, copyrighted content, and API keys. This implementation demonstrates the conditions under which membership inference succeeds and when it does not.
 
 The key insight: generalization gap is the strongest predictor of privacy leakage. This directly informs deployment decisions:
 - Proper regularization reduces privacy risk as a side effect

@@ -76,7 +76,7 @@ def compute_privacy_spent(
 ) -> tuple[float, float]:
     """Compute (ε, δ) spent for DP-SGD.
 
-    ⚠ IMPORTANT — RESEARCH APPROXIMATION, NOT PRODUCTION ACCOUNTANT ⚠
+    ⚠ IMPORTANT  --  RESEARCH APPROXIMATION, NOT PRODUCTION ACCOUNTANT ⚠
     ─────────────────────────────────────────────────────────────────────
     This function implements a simplified RDP accounting formula.
     It uses the basic Gaussian mechanism RDP bound (α / 2σ²) plus a
@@ -93,7 +93,7 @@ def compute_privacy_spent(
     privacy guarantees.
 
     Returns:
-        (epsilon, delta) — approximate values only.
+        (epsilon, delta)  --  approximate values only.
         epsilon is labelled with a warning in the returned metadata.
 
     EXTERNAL VALIDATION REQUIRED: results not independently verified
@@ -132,7 +132,7 @@ def compute_privacy_spent(
         return eps, delta
 
     elif accountant == "gdp":
-        # Gaussian DP (approximate — same caveat as above)
+        # Gaussian DP (approximate  --  same caveat as above)
         from scipy.stats import norm
 
         mu = np.sqrt(steps) * sample_rate / noise_multiplier

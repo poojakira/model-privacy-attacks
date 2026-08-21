@@ -1,7 +1,7 @@
 """
 src/privacy_attacks/mia/lira.py
 ──────────────────────────────────────────────────────────────────────────────
-LiRA — Likelihood Ratio Attack (Carlini et al., 2022).
+LiRA  --  Likelihood Ratio Attack (Carlini et al., 2022).
 
 Reference
 ---------
@@ -27,7 +27,7 @@ Gaussians gives a per-sample membership score.
 Key advantages over Shokri:
   - Principled statistical test (Neyman-Pearson framework)
   - Per-sample calibration (no global threshold)
-  - Achieves TPR > 10% at FPR = 0.1% — the correct operating point for
+  - Achieves TPR > 10% at FPR = 0.1%  --  the correct operating point for
     privacy auditing (not the balanced threshold used in older work)
   - Does not require access to the training data distribution
 
@@ -40,7 +40,7 @@ and a "full" mode (N_shadow=64) for rigorous evaluation.
 Scope
 -----
 This implementation operates on sklearn-compatible models (predict_proba).
-For neural network implementations, the same algorithm applies — shadow models
+For neural network implementations, the same algorithm applies  --  shadow models
 are simply retrained on subsets of the dataset.
 """
 
@@ -248,7 +248,7 @@ class LiRA:
 
         auc = float(roc_auc_score(all_labels, all_scores))
 
-        # TPR at low FPR (0.1%) — the correct operating point per Carlini 2022
+        # TPR at low FPR (0.1%)  --  the correct operating point per Carlini 2022
         sorted_nonmember = np.sort(nonmember_scores)[::-1]
         fpr_threshold_idx = max(0, int(len(sorted_nonmember) * 0.001) - 1)
         if len(sorted_nonmember) > 0:
@@ -275,7 +275,7 @@ class LiRA:
             "n_nonmembers_evaluated": n_nm,
             "note": (
                 "LiRA uses per-sample likelihood ratio test between IN/OUT Gaussian distributions. "
-                "TPR@0.1%FPR is the operationally relevant metric per Carlini et al. 2022 — "
+                "TPR@0.1%FPR is the operationally relevant metric per Carlini et al. 2022  --  "
                 "not balanced accuracy or AUC at equal thresholds."
             ),
         }

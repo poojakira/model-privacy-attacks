@@ -94,10 +94,10 @@ def _risk_level_from_epsilon(epsilon: float) -> str:
     Classify privacy risk based on achieved epsilon.
 
     Risk thresholds (based on practical DP-ML literature):
-      LOW      — epsilon <= 1.0  (strong privacy; recommended for sensitive data)
-      MEDIUM   — epsilon <= 3.0  (moderate; acceptable for non-sensitive data)
-      HIGH     — epsilon <= 10.0 (weak; privacy guarantees are limited)
-      CRITICAL — epsilon > 10.0  (near-useless privacy guarantee)
+      LOW       --  epsilon <= 1.0  (strong privacy; recommended for sensitive data)
+      MEDIUM    --  epsilon <= 3.0  (moderate; acceptable for non-sensitive data)
+      HIGH      --  epsilon <= 10.0 (weak; privacy guarantees are limited)
+      CRITICAL  --  epsilon > 10.0  (near-useless privacy guarantee)
     """
     if epsilon <= 1.0:
         return "LOW"

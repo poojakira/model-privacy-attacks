@@ -1,4 +1,4 @@
-# RUNBOOK — model-privacy-attacks
+# RUNBOOK  --  model-privacy-attacks
 
 ## Prerequisites
 
@@ -56,6 +56,6 @@ pytest tests/ -v
 | Issue | Fix |
 |-------|-----|
 | `ModuleNotFoundError: privacy_attacks` | Run `pip install -e ".[dev]"` from repo root |
-| `attack_v19_core` test skipped | Optional dependency, not on PyPI — safe to ignore |
+| `attack_v19_core` test skipped | Optional dependency, not on PyPI  --  safe to ignore |
 | MIA AUC exactly 0.5 | Check that member/non-member splits do not overlap |
 | OOM on large datasets | Subsample before passing to `fit` |

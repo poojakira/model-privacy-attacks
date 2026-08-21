@@ -1,4 +1,4 @@
-"""Tests for privacy_attacks.assess — privacy risk assessment.
+"""Tests for privacy_attacks.assess  --  privacy risk assessment.
 
 Uses _data_override to inject local sklearn datasets (no network required).
 Tests verify that an overfit model shows higher MIA AUC than a well-generalized one.
