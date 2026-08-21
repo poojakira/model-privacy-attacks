@@ -7,7 +7,7 @@ Outputs structured JSON with:
   - MIA advantage score and interpretation
   - DP epsilon / delta
   - Risk level assessment
-  - Potentially applicable EU AI Act articles (informational reference only  -- 
+  - Potentially applicable EU AI Act articles (informational reference only  --
     not a legal determination; consult qualified legal counsel for compliance advice)
   - Recommended mitigations
 
@@ -249,7 +249,9 @@ def _mitigations(risk_level: str, epsilon: float | None) -> list[str]:
             "Notify DPO and consider suspending model deployment until remediated.",
         ]
     if epsilon is None:
-        base.append("No differential privacy applied  --  strongly recommended for high-risk systems.")
+        base.append(
+            "No differential privacy applied  --  strongly recommended for high-risk systems."
+        )
     return base
 
 
